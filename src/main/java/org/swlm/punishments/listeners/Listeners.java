@@ -23,38 +23,61 @@ public class Listeners implements Listener {
     }
 
     @EventHandler
+    public void onBanPlayerPreLoginEvent(BanPlayerPreLoginEvent event) {
+        PunishmentStorageImpl punishment = event.getPunishment();
+        if (punishment == null) return;
+
+        OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(punishment.getAdmin());
+
+        String message = plugin.getMainConfig().getString("window-messages.ban")
+                .replace("%admin%", Objects.requireNonNull(offlinePlayer.getName()))
+                .replace("%reason%", punishment.getReason()
+        );
+
+        event.getPreLoginEvent().setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
+        event.getPreLoginEvent().kickMessage(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
+    }
+
+    @EventHandler
+    public void onTemporaryBanPreLoginEvent(TemporaryBanPlayerPreLoginEvent event) {
+        PunishmentStorageImpl punishment = event.getPunishment();
+        if (punishment == null) return;
+
+        long expireTime = punishment.getTime();
+        String formatTime = Utils.getRemainingTimeFormat(
+                expireTime - System.currentTimeMillis()
+        );
+
+        OfflinePlayer player = Bukkit.getOfflinePlayer(punishment.getAdmin());
+
+        String message = plugin.getMainConfig().getString("window-messages.tempban")
+                .replace("%admin%", Objects.requireNonNull(player.getName()))
+                .replace("%date%", formatTime)
+                .replace("%reason%", punishment.getReason());
+
+        event.getPreLoginEvent().setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
+        event.getPreLoginEvent().kickMessage(
+                Component.text(ChatColor.translateAlternateColorCodes('&', message))
+        );
+    }
+
+    @EventHandler
     public void onAsyncPlayerPreLoginEvent(AsyncPlayerPreLoginEvent event) {
         PunishmentStorageImpl punishment = plugin.getDatabase().getPunishmentByUUID(event.getUniqueId());
         if (punishment == null) return;
 
         switch (punishment.getType()) {
             case FOREVER: {
-                OfflinePlayer player = Bukkit.getOfflinePlayer(punishment.getAdmin());
-
-                String message = plugin.getMainConfig().getString("window-messages.ban")
-                        .replace("%admin%", Objects.requireNonNull(player.getName()))
-                        .replace("%reason%", punishment.getReason());
-
-                event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
-                event.kickMessage(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
+                BanPlayerPreLoginEvent banPlayerPreLoginEvent = new BanPlayerPreLoginEvent(punishment, event);
+                Bukkit.getPluginManager().callEvent(banPlayerPreLoginEvent);
                 break;
             }
 
             case TEMPORARILY: {
-                long expireTime = punishment.getTime();
-                String formatTime = Utils.getRemainingTimeFormat(
-                        expireTime - System.currentTimeMillis()
+                TemporaryBanPlayerPreLoginEvent temporaryBanPlayerPreLoginEvent = new TemporaryBanPlayerPreLoginEvent(
+                        punishment, event
                 );
-
-                OfflinePlayer player = Bukkit.getOfflinePlayer(punishment.getAdmin());
-
-                String message = plugin.getMainConfig().getString("window-messages.tempban")
-                        .replace("%admin%", Objects.requireNonNull(player.getName()))
-                        .replace("%date%", formatTime)
-                        .replace("%reason%", punishment.getReason());
-
-                event.setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
-                event.kickMessage(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
+                Bukkit.getPluginManager().callEvent(temporaryBanPlayerPreLoginEvent);
             }
         }
     }

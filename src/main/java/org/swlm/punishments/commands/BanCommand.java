@@ -57,9 +57,9 @@ public class BanCommand extends AbstractCommand {
             return;
         }
 
-        if (Objects.equals(player.getName(), offlinePlayer.getName())) {
-            return;
-        }
+//        if (Objects.equals(player.getName(), offlinePlayer.getName())) {
+//            return;
+//        }
 
         PunishmentStorageImpl punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
         if (punishment != null) {

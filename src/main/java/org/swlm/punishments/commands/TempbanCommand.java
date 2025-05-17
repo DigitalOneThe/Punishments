@@ -85,7 +85,7 @@ public class TempbanCommand extends AbstractCommand {
             if (Utils.isBanDurationExceeded(plugin, player.getUniqueId(), millis)
                     && !Utils.isAdmin(plugin, player.getUniqueId())) {
                 String message = plugin.getMainConfig()
-                        .getString("warning-messages.exceeded-ban-limit").replace("%limit%",
+                        .getString("warning-messages.failed-attempt.exceeded-ban-limit").replace("%limit%",
                         plugin.getMainConfig().getString("limits.commands." +
                                 Utils.getPrimaryGroup(plugin, player.getUniqueId())
                         )
