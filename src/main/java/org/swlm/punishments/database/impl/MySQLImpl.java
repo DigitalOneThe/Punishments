@@ -51,7 +51,7 @@ public class MySQLImpl implements IDatabase {
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
                 OfflinePlayer adminPlayer = Bukkit.getOfflinePlayer(admin);
 
-                String query = "INSERT INTO `table_bans` (`player-uuid`, `admin-uuid`, `admin-name`, `player-name`, `type`, `unban-time`, `ban-time`, `reason`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                String query = "INSERT INTO `table_bans` (`player-uuid`, `admin-uuid`, `admin-name`, `player-name`, `ban-type`, `unban-time`, `ban-time`, `ban-reason`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
                 try (PreparedStatement ps = connection.prepareStatement(query)) {
                     ps.setString(1, player.toString());
@@ -107,7 +107,7 @@ public class MySQLImpl implements IDatabase {
     @Override
     public void updatePunishments() {
         CompletableFuture.runAsync(() -> {
-            String query = "DELETE FROM `table_bans` WHERE `unban-time` <= ? AND `type` != 'FOREVER'";
+            String query = "DELETE FROM `table_bans` WHERE `unban-time` <= ? AND `ban-type` != 'FOREVER'";
 
             try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setLong(1, System.currentTimeMillis());
@@ -132,10 +132,10 @@ public class MySQLImpl implements IDatabase {
                     while (rs.next()) {
                         UUID playerUuid = UUID.fromString(rs.getString("player-uuid"));
                         UUID adminUuid = UUID.fromString(rs.getString("admin-uuid"));
-                        String type = rs.getString("type");
+                        String type = rs.getString("ban-type");
                         long time = rs.getLong("unban-time");
                         long banTime = rs.getLong("ban-time");
-                        String reason = rs.getString("reason");
+                        String reason = rs.getString("ban-reason");
 
                         storage = new PunishmentStorageImpl(
                                 plugin, playerUuid, adminUuid, PunishmentType.valueOf(type), time, banTime, reason
