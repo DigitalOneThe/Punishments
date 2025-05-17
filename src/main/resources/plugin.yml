@@ -1,0 +1,11 @@
+name: Punishments
+version: '${project.version}'
+main: org.swlm.punishments.Punishments
+api-version: '1.16'
+commands:
+  ban: {}
+  unban: {}
+  tempban: {}
+  punishment: {}
+depend:
+  - LuckPerms
