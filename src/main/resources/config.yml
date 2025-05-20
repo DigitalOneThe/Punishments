@@ -53,38 +53,42 @@ messages:
 command-arguments:
   ban:
     - ""
-    - "&6 - Заблокировать игрока навсегда"
+    - "&6 > Заблокировать игрока навсегда"
     - "&aФормат: &e/ban {PLAYER} {REASON}"
     - ""
   tempban:
     - ""
-    - "&6 - Временно заблокировать игрока"
+    - "&6 > Временно заблокировать игрока"
     - "&aФормат: &e/tempban {PLAYER} {TIME (1h/2d/3s/4m)} {REASON}"
   unban:
     - ""
-    - "&6 - Снять блокировку с игрока"
+    - "&6 > Снять блокировку с игрока"
     - "&aФормат: &e/unban {PLAYER}"
     - ""
   history:
     - ""
-    - "&6 - История наказаний"
+    - "&6 > История наказаний"
     - "&aФормат: /history {PLAYER} {PUNISHMENT_TYPE} {KEY}" # 3 arg - incoming / outgoing
     - ""
   punishment:
     - ""
-    - "&6 - Основная команда плагина"
-    - "&aФормат: &6/punishment options rollback|edit"
+    - "&6 > Основная команда плагина"
+    - "&aФормат: &6/punishment options rollback|edit|logs"
     - ""
   punishment-rollback:
     - ""
-    - "&6 - Откат наказаний"
+    - "&6 > Откат наказаний"
     - "&aФормат: &6/punishment options rollback {ADMIN} {LAST TIME (1h/1d/1m)}"
     - ""
   punishment-edit:
     - ""
-    - "&6 - Редактировать наказание"
+    - "&6 > Редактировать наказание"
     - "&aФормат: &6/punishment options edit {PLAYER}"
     - ""
+  punishment-logs:
+    - ""
+    - "&6 > Логи наказаний игрока"
+    - "&aФормат: &6/punishment options logs {PLAYER} {LAST TIME (1h/1d/1m)}"
 
 
 

@@ -51,7 +51,9 @@ public class MySQLImpl implements IDatabase {
                 OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
                 OfflinePlayer adminPlayer = Bukkit.getOfflinePlayer(admin);
 
-                String query = "INSERT INTO `table_bans` (`player-uuid`, `admin-uuid`, `admin-name`, `player-name`, `ban-type`, `unban-time`, `ban-time`, `ban-reason`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+                String query =
+                        "INSERT INTO `table_bans` (`player-uuid`, `admin-uuid`, `admin-name`, `player-name`, `ban-type`, `unban-time`, `ban-time`, `ban-reason`) VALUES (?, ?, ?, ?, ?, ?, ?, ?); " +
+                        "INSERT INTO `table_ban_logs` (`player-uuid`, `admin-uuid`, `ban-type`, `ban-date`, `ban-reason`) VALUES (?, ?, ?, ?, ?)";
 
                 try (PreparedStatement ps = connection.prepareStatement(query)) {
                     ps.setString(1, player.toString());
@@ -62,6 +64,12 @@ public class MySQLImpl implements IDatabase {
                     ps.setLong(6, unbanTime);
                     ps.setLong(7, System.currentTimeMillis());
                     ps.setString(8, reason);
+
+                    ps.setString(9, player.toString());
+                    ps.setString(10, admin.toString());
+                    ps.setString(11, type.toString());
+                    ps.setLong(12, System.currentTimeMillis());
+                    ps.setString(13, reason);
 
                     ps.executeUpdate();
                 }

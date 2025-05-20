@@ -78,5 +78,10 @@
           <version>5.4</version>
           <scope>provided</scope>
       </dependency>
+      <dependency>
+          <groupId>com.github.stefvanschie.inventoryframework</groupId>
+          <artifactId>IF</artifactId>
+          <version>0.10.19</version>
+      </dependency>
   </dependencies>
 </project>
