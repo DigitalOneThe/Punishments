@@ -8,7 +8,7 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.swlm.punishments.Punishments;
-import org.swlm.punishments.storage.impl.PunishmentStorageImpl;
+import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
 
 import java.util.ArrayList;
@@ -54,7 +54,7 @@ public class UnbanCommand extends AbstractCommand {
         }
 
 
-        PunishmentStorageImpl punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
+        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
         if (punishment == null) {
             String message = plugin.getMainConfig()
                     .getString("warning-messages.failed-attempt.not-banned")

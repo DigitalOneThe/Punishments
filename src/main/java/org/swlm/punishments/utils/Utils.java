@@ -1,10 +1,16 @@
 package org.swlm.punishments.utils;
 
+import net.kyori.adventure.text.Component;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
 import org.swlm.punishments.Punishments;
+import org.swlm.punishments.storage.impl.Punishment;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -106,5 +112,23 @@ public class Utils {
     public static boolean isAdmin(Punishments plugin, UUID uuid) {
         List<String> list = plugin.getMainConfig().getStringList("limits.overrides");
         return list.contains(getPrimaryGroup(plugin, uuid));
+    }
+
+    public static List<Component> parseComponents(List<String> strings, Punishment punishment) {
+        List<Component> components = new ArrayList<>();
+        strings.forEach(string -> {
+            OfflinePlayer admin = Bukkit.getOfflinePlayer(punishment.getAdmin());
+            OfflinePlayer player = Bukkit.getOfflinePlayer(punishment.getPlayer());
+
+            components.add(Component.text(string
+                    .replace("%admin%", Objects.requireNonNull(admin.getName()))
+                    .replace("%player%", Objects.requireNonNull(player.getName()))
+                    .replace("%date%", "Дата наказания")
+                    .replace("%type%", punishment.getType().name())
+                    .replace("%reason%", punishment.getReason()))
+            );
+        });
+
+        return components;
     }
 }

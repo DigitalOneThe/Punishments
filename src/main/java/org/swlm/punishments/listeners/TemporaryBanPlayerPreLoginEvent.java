@@ -5,16 +5,16 @@ import org.bukkit.event.Event;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.jetbrains.annotations.NotNull;
-import org.swlm.punishments.storage.impl.PunishmentStorageImpl;
+import org.swlm.punishments.storage.impl.Punishment;
 
 public class TemporaryBanPlayerPreLoginEvent extends Event implements Cancellable {
 
-    private final PunishmentStorageImpl punishment;
+    private final Punishment punishment;
     private boolean isCancelled;
     private final AsyncPlayerPreLoginEvent preLoginEvent;
     private static final HandlerList HANDLERS_LIST = new HandlerList();
 
-    public TemporaryBanPlayerPreLoginEvent(PunishmentStorageImpl punishment, AsyncPlayerPreLoginEvent preLoginEvent) {
+    public TemporaryBanPlayerPreLoginEvent(Punishment punishment, AsyncPlayerPreLoginEvent preLoginEvent) {
         super(true);
         this.isCancelled = false;
         this.punishment = punishment;
@@ -50,7 +50,7 @@ public class TemporaryBanPlayerPreLoginEvent extends Event implements Cancellabl
         this.isCancelled = cancel;
     }
 
-    public PunishmentStorageImpl getPunishment() {
+    public Punishment getPunishment() {
         return punishment;
     }
 

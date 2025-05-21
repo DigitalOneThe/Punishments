@@ -8,7 +8,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.swlm.punishments.Punishments;
-import org.swlm.punishments.storage.impl.PunishmentStorageImpl;
+import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
 
 import java.util.Objects;
@@ -24,7 +24,7 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onBanPlayerPreLoginEvent(BanPlayerPreLoginEvent event) {
-        PunishmentStorageImpl punishment = event.getPunishment();
+        Punishment punishment = event.getPunishment();
         if (punishment == null) return;
 
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(punishment.getAdmin());
@@ -40,7 +40,7 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onTemporaryBanPreLoginEvent(TemporaryBanPlayerPreLoginEvent event) {
-        PunishmentStorageImpl punishment = event.getPunishment();
+        Punishment punishment = event.getPunishment();
         if (punishment == null) return;
 
         long expireTime = punishment.getTime();
@@ -63,7 +63,7 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onAsyncPlayerPreLoginEvent(AsyncPlayerPreLoginEvent event) {
-        PunishmentStorageImpl punishment = plugin.getDatabase().getPunishmentByUUID(event.getUniqueId());
+        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(event.getUniqueId());
         if (punishment == null) return;
 
         switch (punishment.getType()) {

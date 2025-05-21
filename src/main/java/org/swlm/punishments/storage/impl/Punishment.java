@@ -6,7 +6,7 @@ import org.swlm.punishments.storage.IDataSource;
 
 import java.util.UUID;
 
-public class PunishmentStorageImpl implements IDataSource {
+public class Punishment implements IDataSource {
 
     private final UUID playerUuid;
     private final UUID adminUuid;
@@ -17,7 +17,7 @@ public class PunishmentStorageImpl implements IDataSource {
 
     private final Punishments plugin;
 
-    public PunishmentStorageImpl(Punishments plugin, UUID playerUuid, UUID adminUuid, PunishmentType type, long time, long banTime, String reason) {
+    public Punishment(Punishments plugin, UUID playerUuid, UUID adminUuid, PunishmentType type, long time, long banTime, String reason) {
         this.playerUuid = playerUuid;
         this.adminUuid = adminUuid;
         this.type = type;

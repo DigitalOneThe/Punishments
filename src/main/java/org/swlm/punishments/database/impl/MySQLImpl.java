@@ -7,7 +7,7 @@ import org.bukkit.OfflinePlayer;
 import org.swlm.punishments.PunishmentType;
 import org.swlm.punishments.Punishments;
 import org.swlm.punishments.database.IDatabase;
-import org.swlm.punishments.storage.impl.PunishmentStorageImpl;
+import org.swlm.punishments.storage.impl.Punishment;
 
 import java.sql.*;
 
@@ -127,11 +127,11 @@ public class MySQLImpl implements IDatabase {
     }
 
     @Override
-    public PunishmentStorageImpl getPunishmentByUUID(UUID uuid) {
+    public Punishment getPunishmentByUUID(UUID uuid) {
         return CompletableFuture.supplyAsync(() -> {
             String query = "SELECT * FROM `table_bans` WHERE `player-uuid` = ? LIMIT 1";
 
-            PunishmentStorageImpl storage = null;
+            Punishment storage = null;
 
             try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setString(1, uuid.toString());
@@ -145,7 +145,7 @@ public class MySQLImpl implements IDatabase {
                         long banTime = rs.getLong("ban-time");
                         String reason = rs.getString("ban-reason");
 
-                        storage = new PunishmentStorageImpl(
+                        storage = new Punishment(
                                 plugin, playerUuid, adminUuid, PunishmentType.valueOf(type), time, banTime, reason
                         );
                     }

@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.swlm.punishments.PunishmentType;
 import org.swlm.punishments.Punishments;
-import org.swlm.punishments.storage.impl.PunishmentStorageImpl;
+import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
 
 import java.util.*;
@@ -61,7 +61,7 @@ public class BanCommand extends AbstractCommand {
 //            return;
 //        }
 
-        PunishmentStorageImpl punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
+        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
         if (punishment != null) {
             String message = plugin.getMainConfig()
                     .getString("warning-messages.failed-attempt.has-already-banned")
