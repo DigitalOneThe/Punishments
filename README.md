@@ -20,9 +20,3 @@ Penalty Logging System
 - [ ] Implement the ability to punish a player in chat, by putting a gag on the player. `(/mute)`
 - [ ] Full-fledged warning system `(/warn)`
 
-
-
-
-
-> [!IMPORTANT]
-> The plugin was tested only on the `server version 1.16.5` and developed also for the server version 1.16.5. Therefore, do not find a multi-version of the plugin.
