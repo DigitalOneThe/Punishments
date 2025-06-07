@@ -81,7 +81,7 @@
       <dependency>
           <groupId>com.github.stefvanschie.inventoryframework</groupId>
           <artifactId>IF</artifactId>
-          <version>0.10.19</version>
+          <version>LATEST</version>
       </dependency>
   </dependencies>
 </project>

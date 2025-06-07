@@ -11,6 +11,8 @@ import org.swlm.punishments.storage.impl.Punishment;
 
 import java.sql.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
@@ -46,14 +48,14 @@ public class MySQLImpl implements IDatabase {
 
     @Override
     public void insertBan(UUID player, UUID admin, PunishmentType type, long unbanTime, String reason) {
+        long currentTime = System.currentTimeMillis();
         CompletableFuture.runAsync(() -> {
-            try (Connection connection = getConnection()) {
-                OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
-                OfflinePlayer adminPlayer = Bukkit.getOfflinePlayer(admin);
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
+            OfflinePlayer adminPlayer = Bukkit.getOfflinePlayer(admin);
 
+            try (Connection connection = getConnection()) {
                 String query =
-                        "INSERT INTO `table_bans` (`player-uuid`, `admin-uuid`, `admin-name`, `player-name`, `ban-type`, `unban-time`, `ban-time`, `ban-reason`) VALUES (?, ?, ?, ?, ?, ?, ?, ?); " +
-                        "INSERT INTO `table_ban_logs` (`player-uuid`, `admin-uuid`, `ban-type`, `ban-date`, `ban-reason`) VALUES (?, ?, ?, ?, ?)";
+                        "INSERT INTO `table_bans` (`player-uuid`, `admin-uuid`, `admin-name`, `player-name`, `ban-type`, `unban-time`, `ban-time`, `ban-reason`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
 
                 try (PreparedStatement ps = connection.prepareStatement(query)) {
                     ps.setString(1, player.toString());
@@ -62,14 +64,8 @@ public class MySQLImpl implements IDatabase {
                     ps.setString(4, offlinePlayer.getName());
                     ps.setString(5, type.toString());
                     ps.setLong(6, unbanTime);
-                    ps.setLong(7, System.currentTimeMillis());
+                    ps.setLong(7, currentTime);
                     ps.setString(8, reason);
-
-                    ps.setString(9, player.toString());
-                    ps.setString(10, admin.toString());
-                    ps.setString(11, type.toString());
-                    ps.setLong(12, System.currentTimeMillis());
-                    ps.setString(13, reason);
 
                     ps.executeUpdate();
                 }
@@ -77,6 +73,25 @@ public class MySQLImpl implements IDatabase {
                 throw new RuntimeException(e);
             }
         }).join();
+
+        insertBanHistory(player, admin, type, currentTime, reason);
+    }
+
+    public void insertBanHistory(UUID player, UUID admin, PunishmentType type, long banDate, String reason) {
+        CompletableFuture.runAsync(() -> {
+            String query = "INSERT INTO `table_ban_logs` (`player-uuid`, `admin-uuid`, `ban-type`, `ban-date`, `ban-reason`) VALUES (?, ?, ?, ?, ?)";
+            try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
+                ps.setString(1, player.toString());
+                ps.setString(2, admin.toString());
+                ps.setString(3, type.toString());
+                ps.setLong(4, banDate);
+                ps.setString(5, reason);
+
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     @Override
@@ -155,6 +170,47 @@ public class MySQLImpl implements IDatabase {
             }
 
             return storage;
+        }).join();
+    }
+
+    @Override
+    public List<Punishment> getPunishmentsByAdmin(UUID uuid, long timeMillis) {
+        return CompletableFuture.supplyAsync(() -> {
+            String query = "SELECT * FROM `table_ban_logs` WHERE `admin-uuid` = ? AND `ban-date` < ?";
+
+            long cutoffTimeMillis = System.currentTimeMillis() - timeMillis;
+
+            List<Punishment> punishments = new ArrayList<>();
+            try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
+                ps.setString(1, uuid.toString());
+                ps.setLong(2, cutoffTimeMillis);
+
+                try (ResultSet rs = ps.executeQuery()) {
+                    while (rs.next()) {
+                        UUID playerUuid = UUID.fromString(rs.getString("player-uuid"));
+                        UUID adminUuid = UUID.fromString(rs.getString("admin-uuid"));
+                        String reason = rs.getString("ban-reason");
+                        long banDate = rs.getLong("ban-date");
+                        String type = rs.getString("ban-type");
+
+                        Punishment punishment = new Punishment(
+                                plugin,
+                                playerUuid,
+                                adminUuid,
+                                PunishmentType.valueOf(type),
+                                0,
+                                banDate,
+                                reason
+                        );
+
+                        punishments.add(punishment);
+                    }
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+            return punishments;
         }).join();
     }
 }

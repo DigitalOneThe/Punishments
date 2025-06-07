@@ -4,6 +4,7 @@ import com.github.stefvanschie.inventoryframework.gui.GuiItem;
 import com.github.stefvanschie.inventoryframework.gui.type.ChestGui;
 import com.github.stefvanschie.inventoryframework.pane.PaginatedPane;
 import net.kyori.adventure.text.Component;
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -34,7 +35,7 @@ public class Logging implements IGui {
 
     @Override
     public void open(Player player) {
-        ChestGui gui = new ChestGui(rows, title);
+        ChestGui gui = new ChestGui(rows, ChatColor.translateAlternateColorCodes('&', title));
         gui.setOnGlobalClick(inventoryClickEvent -> inventoryClickEvent.setCancelled(isGlobalClick));
 
         PaginatedPane pane = new PaginatedPane(1, 1, 7, 4);

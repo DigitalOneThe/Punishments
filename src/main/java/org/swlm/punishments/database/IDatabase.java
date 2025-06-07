@@ -6,6 +6,7 @@ import org.swlm.punishments.storage.impl.Punishment;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.UUID;
 
 public interface IDatabase {
@@ -17,4 +18,5 @@ public interface IDatabase {
     int rollbackPunishments(UUID uuid, long millis);
     void updatePunishments();
     Punishment getPunishmentByUUID(UUID uuid);
+    List<Punishment> getPunishmentsByAdmin(UUID uuid, long timeMillis);
 }

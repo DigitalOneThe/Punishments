@@ -5,6 +5,7 @@
       <element id="module-output" name="Punishments" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/slf4j/slf4j-api/1.7.25/slf4j-api-1.7.25.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/zaxxer/HikariCP/6.2.1/HikariCP-6.2.1.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/github/stefvanschie/inventoryframework/IF/0.10.19/IF-0.10.19.jar" path-in-jar="/" />
     </root>
   </artifact>
 </component>

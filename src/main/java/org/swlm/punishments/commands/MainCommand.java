@@ -7,6 +7,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.swlm.punishments.Punishments;
+import org.swlm.punishments.gui.IGui;
+import org.swlm.punishments.gui.impl.Logging;
+import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
 
 import java.util.*;
@@ -31,6 +34,10 @@ public class MainCommand extends AbstractCommand {
             return;
         }
 
+        if (!Objects.equals(args[0], "options")) {
+            return;
+        }
+
         if (Objects.equals(args[1], "rollback")) {
             if (args.length != 4) {
                 List<String> message = plugin.getMainConfig().getStringList("command-arguments.punishment-rollback");
@@ -48,7 +55,6 @@ public class MainCommand extends AbstractCommand {
             }
 
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(name);
-
             if (offlinePlayer == null) {
                 String message = plugin.getMainConfig().getString("warning-messages.failed-attempt.not-found")
                         .replace("%player%", name);
@@ -66,6 +72,40 @@ public class MainCommand extends AbstractCommand {
 
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
         }
+
+        if (Objects.equals(args[1], "logs")) {
+            if (args.length != 4) {
+                List<String> message = plugin.getMainConfig().getStringList("command-arguments.punishment-logs");
+                message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
+                return;
+            }
+
+            String name = args[2];
+            String time = args[3];
+
+            if (time.length() < 2) {
+                List<String> message = plugin.getMainConfig().getStringList("command-arguments.punishment-logs");
+                message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
+            }
+
+            OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(name);
+            if (offlinePlayer == null) {
+                String message = plugin.getMainConfig().getString("warning-messages.failed-attempt.not-found")
+                        .replace("%player%", name);
+
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                return;
+            }
+
+            long millis = Utils.getTimeFromString(time);
+            List<Punishment> punishments = plugin.getDatabase().getPunishmentsByAdmin(
+                    offlinePlayer.getUniqueId(), millis
+            );
+
+            if (punishments.isEmpty()) return;
+            IGui gui = new Logging(plugin, "Логи", 6, true, punishments);
+            gui.open(((Player) sender).getPlayer());
+        }
     }
 
     @Override
@@ -74,7 +114,7 @@ public class MainCommand extends AbstractCommand {
             return Collections.singletonList("options");
         } else {
             if (args.length < 3) {
-                return Arrays.asList("rollback", "edit");
+                return Arrays.asList("rollback", "edit", "logs");
             }
 
             if (args[2].isEmpty()) {

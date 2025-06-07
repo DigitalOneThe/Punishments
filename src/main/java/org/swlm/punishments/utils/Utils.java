@@ -4,14 +4,19 @@ import net.kyori.adventure.text.Component;
 import net.luckperms.api.model.user.User;
 import net.luckperms.api.model.user.UserManager;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.swlm.punishments.Punishments;
 import org.swlm.punishments.storage.impl.Punishment;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.sql.Date;
+import java.text.Normalizer;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.FormatStyle;
+import java.time.temporal.TemporalField;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -120,11 +125,19 @@ public class Utils {
             OfflinePlayer admin = Bukkit.getOfflinePlayer(punishment.getAdmin());
             OfflinePlayer player = Bukkit.getOfflinePlayer(punishment.getPlayer());
 
-            components.add(Component.text(string
+            LocalDate localDate = new Date(punishment.getBanTime()).toLocalDate();
+            DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(
+                    FormatStyle.FULL
+            ).withLocale(
+                    new Locale("ru", "RU")
+            );
+            String dateFormat = localDate.format(formatter);
+
+            components.add(Component.text(ChatColor.translateAlternateColorCodes('&', string)
                     .replace("%admin%", Objects.requireNonNull(admin.getName()))
                     .replace("%player%", Objects.requireNonNull(player.getName()))
-                    .replace("%date%", "Дата наказания")
-                    .replace("%type%", punishment.getType().name())
+                    .replace("%date%", dateFormat.toUpperCase())
+                    .replace("%type%", punishment.getType().getName())
                     .replace("%reason%", punishment.getReason()))
             );
         });
