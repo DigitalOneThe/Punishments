@@ -8,6 +8,7 @@ import org.swlm.punishments.PunishmentType;
 import org.swlm.punishments.Punishments;
 import org.swlm.punishments.database.IDatabase;
 import org.swlm.punishments.storage.impl.Punishment;
+import org.swlm.punishments.utils.Utils;
 
 import java.sql.*;
 
@@ -15,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 public class MySQLImpl implements IDatabase {
 
@@ -34,6 +36,8 @@ public class MySQLImpl implements IDatabase {
         config.addDataSourceProperty("maximumPoolSize", 30);
         this.source = new HikariDataSource(config);
         this.plugin = plugin;
+
+        insertTables();
     }
 
     @Override
@@ -44,6 +48,34 @@ public class MySQLImpl implements IDatabase {
     @Override
     public void disable() {
         source.close();
+    }
+
+    public void insertTables() {
+        CompletableFuture.runAsync(() -> {
+            try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS `table_bans` (" +
+                        "  `player-uuid` VARCHAR(36) NOT NULL," +
+                        "  `player-name` VARCHAR(24) NOT NULL," +
+                        "  `admin-uuid` VARCHAR(36) NOT NULL," +
+                        "  `admin-name` VARCHAR(24) NOT NULL," +
+                        "  `ban-type` VARCHAR(13) NOT NULL," +
+                        "  `unban-time` BIGINT(20) NOT NULL," +
+                        "  `ban-time` BIGINT(20) NOT NULL," +
+                        "  `ban-reason` VARCHAR(128) NOT NULL DEFAULT 'Administrative ban!'," +
+                        "  PRIMARY KEY (`player-uuid`))"
+                );
+
+                statement.executeUpdate("CREATE TABLE IF NOT EXISTS `table_ban_logs` (" +
+                        "  `player-uuid` VARCHAR(36) NOT NULL," +
+                        "  `admin-uuid` VARCHAR(36) NOT NULL," +
+                        "  `ban-type` VARCHAR(13) NOT NULL," +
+                        "  `ban-date` BIGINT(20) DEFAULT NULL," +
+                        "  `ban-reason` VARCHAR(128) NOT NULL DEFAULT 'Administrative ban!')"
+                );
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }).join();
     }
 
     @Override
@@ -91,7 +123,7 @@ public class MySQLImpl implements IDatabase {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        });
+        }).join();
     }
 
     @Override
@@ -134,6 +166,20 @@ public class MySQLImpl implements IDatabase {
 
             try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setLong(1, System.currentTimeMillis());
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }).join();
+    }
+
+    @Override
+    public void deleteOldLogs() {
+        CompletableFuture.runAsync(() -> {
+            String query = "DELETE FROM `table_ban_logs` WHERE `ban-date` < ?";
+
+            try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
+                ps.setLong(1, System.currentTimeMillis() - Utils.getTimeFromString(plugin.getDeleteLogElementTime()));
                 ps.executeUpdate();
             } catch (SQLException e) {
                 throw new RuntimeException(e);

@@ -17,6 +17,7 @@ public interface IDatabase {
     void deleteBan(UUID player);
     int rollbackPunishments(UUID uuid, long millis);
     void updatePunishments();
+    void deleteOldLogs();
     Punishment getPunishmentByUUID(UUID uuid);
     List<Punishment> getPunishmentsByAdmin(UUID uuid, long timeMillis);
 }

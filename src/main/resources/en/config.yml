@@ -30,6 +30,8 @@ warning-messages:
     failed-unban: "&6This account has a ban issued by the project team, which cannot be lifted!"
     failed-ban: "&6You cannot ban this player."
     exceeded-ban-limit: "&6You have exceeded the maximum ban duration limit. Your limit: %limit%"
+    empty-logs: "&6The punishment log from this player in a certain period of time is empty!"
+    not-permission: "&cYou do not have permissions to use this command."
 
 safety-messages:
   suspicious-ban-activity: "&4SECURITY: &6Administrator %admin% has banned more than 5 players in a short time!"

@@ -138,7 +138,7 @@ public class TempbanCommand extends AbstractCommand {
         }
 
         if (args.length == 3) {
-            return Collections.singletonList("Административный бан!");
+            return Collections.singletonList("Administrative ban!");
         }
 
         return null;

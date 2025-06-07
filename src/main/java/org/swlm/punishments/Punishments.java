@@ -28,12 +28,11 @@ public final class Punishments extends JavaPlugin {
         getServer().getPluginManager().registerEvents(new Listeners(this), this);
 
         mainConfig = new MainConfig(this);
+        localeConfig = new LocaleConfig(this, mainConfig.getString("settings.locale"));
         new UnbanCommand(this);
         new BanCommand(this);
         new TempbanCommand(this);
         new MainCommand(this);
-
-        localeConfig = new LocaleConfig(this, mainConfig.getString("settings.locale"));
 
         String username = mainConfig.getString("database.user");
         String password = mainConfig.getString("database.password");
@@ -44,9 +43,10 @@ public final class Punishments extends JavaPlugin {
         database = new MySQLImpl();
         database.connect(this, username, host, password, name, port);
 
-        Bukkit.getScheduler().runTaskTimer(this, task ->
-                database.updatePunishments(), 0L, 20L
-        );
+        Bukkit.getScheduler().runTaskTimer(this, task -> {
+            database.updatePunishments();
+            database.deleteOldLogs();
+        }, 20L, 20L);
 
         RegisteredServiceProvider<LuckPerms> provider = Bukkit.getServicesManager().getRegistration(LuckPerms.class);
         if (provider != null) {
@@ -81,5 +81,9 @@ public final class Punishments extends JavaPlugin {
 
     public String getLocalizing() {
         return mainConfig.getString("settings.locale");
+    }
+
+    public String getDeleteLogElementTime() {
+        return mainConfig.getString("logs-settings.delete-log-element.storage-time");
     }
 }

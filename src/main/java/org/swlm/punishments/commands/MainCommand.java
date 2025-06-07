@@ -102,8 +102,13 @@ public class MainCommand extends AbstractCommand {
                     offlinePlayer.getUniqueId(), millis
             );
 
-            if (punishments.isEmpty()) return;
-            IGui gui = new Logging(plugin, "&7Логи игрока: &f" + name, 6, true, punishments);
+            if (punishments.isEmpty()) {
+                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.empty-logs");
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                return;
+            }
+
+            IGui gui = new Logging(plugin, "&6Логи игрока: &7" + name, 6, true, punishments);
             gui.open(((Player) sender).getPlayer());
         }
     }

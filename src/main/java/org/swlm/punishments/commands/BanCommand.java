@@ -26,6 +26,11 @@ public class BanCommand extends AbstractCommand {
     @Override
     public void execute(CommandSender sender, Command command, String[] args) {
         if (!(sender instanceof Player)) return;
+        if (!sender.hasPermission("punishments.command.ban")) {
+            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-permission");
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            return;
+        }
 
         if (args.length < 2) {
             List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.ban");
@@ -57,9 +62,9 @@ public class BanCommand extends AbstractCommand {
             return;
         }
 
-//        if (Objects.equals(player.getName(), offlinePlayer.getName())) {
-//            return;
-//        }
+        if (Objects.equals(player.getName(), offlinePlayer.getName())) {
+            return;
+        }
 
         Punishment punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
         if (punishment != null) {
@@ -110,7 +115,7 @@ public class BanCommand extends AbstractCommand {
             Bukkit.getOnlinePlayers().forEach(player -> names.add(player.getName()));
             return names;
         } else if (args.length > 1) {
-            return Collections.singletonList("Административный бан!");
+            return Collections.singletonList("Administrative ban!");
         }
 
         return null;
