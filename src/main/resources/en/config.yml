@@ -1,0 +1,100 @@
+database:
+  user: "root"
+  password: ""
+  name: "minecraft"
+  host: "localhost"
+  port: 3306
+
+limits: # Groups that will bypass all restrictions.
+  # This block works as follows:
+  # If a player has a group from this list, commands like /ban and /tempban will not affect them.
+  # The /unban command has different logic: If an administrator with a lower-ranked group bans a player,
+  # a regular donor without a lower-ranked group will not be able to unban that player.
+  overrides:
+    - "admin"
+    - "moder"
+  commands: # Applies only to temporary bans.
+    vip: "30m"
+    admin: "3d"
+    moder: "15d"
+
+error-messages:
+  error-in-plugin: "&cAn error occurred while the plugin was running. Please contact the developers!"
+  error-in-database: "&cA database error occurred. Please contact the developers!"
+
+warning-messages:
+  failed-attempt:
+    not-found: "&6Player %player% was not found, as they have never joined this server."
+    not-banned: "&4Player %player% is not banned."
+    has-already-banned: "&4Player %player% is already banned."
+    failed-unban: "&6This account has a ban issued by the project team, which cannot be lifted!"
+    failed-ban: "&6You cannot ban this player."
+    exceeded-ban-limit: "&6You have exceeded the maximum ban duration limit. Your limit: %limit%"
+
+safety-messages:
+  suspicious-ban-activity: "&4SECURITY: &6Administrator %admin% has banned more than 5 players in a short time!"
+  suspicious-unban-activity: "&4SECURITY: &6Administrator %admin% has unbanned more than 5 players in a short time!"
+  suspicious-connection-activity: "&4SECURITY: &6More than %connections% connections from a single IP address (%ip%) detected in a short time!"
+
+broadcast-messages:
+  ban: "&6Player %player% has been permanently banned by administrator %admin%. Reason: &6[&4%reason%&6]"
+  tempban: "&6Player %player% has been temporarily banned for %date% by administrator %admin%. Reason: &6[&4%reason%&6]"
+  unban: "&6Player %player% has been unbanned by administrator %admin%."
+
+window-messages:
+  ban: "&6You have been permanently banned from this server by administrator %admin%. Reason: &6[&4%reason%&6]"
+  tempban: "&6You have been temporarily banned from this server by administrator %admin%. Reason: &6[&4%reason%&6]. &6Auto-unban on: %date%."
+
+messages:
+  rollback: "&6You have successfully rolled back all punishments issued by administrator %player%. Punishments affected: &a%count%"
+  edit: "&6You have successfully edited the punishment for player %player%. Data has been updated!"
+
+lore:
+  logging:
+    - ""
+    - "&7> &6Administrator: &f%admin%"
+    - "&7> &6Punished Player: &c%player%"
+    - "&7> &6Punishment Date: &f%date%"
+    - "&7> &6Punishment Type: &e%type%"
+    - "&7> &6Reason: &f%reason%"
+    - ""
+
+command-arguments:
+  ban:
+    - ""
+    - "&6 > Permanently ban a player"
+    - "&aFormat: &e/ban {PLAYER} {REASON}"
+    - ""
+  tempban:
+    - ""
+    - "&6 > Temporarily ban a player"
+    - "&aFormat: &e/tempban {PLAYER} {TIME (1h/2d/3s/4m)} {REASON}"
+  unban:
+    - ""
+    - "&6 > Unban a player"
+    - "&aFormat: &e/unban {PLAYER}"
+    - ""
+  history:
+    - ""
+    - "&6 > Punishment history"
+    - "&aFormat: /history {PLAYER} {PUNISHMENT_TYPE} {KEY}" # 3rd arg - incoming / outgoing
+    - ""
+  punishment:
+    - ""
+    - "&6 > Main plugin command"
+    - "&aFormat: &6/punishment options rollback|edit|logs"
+    - ""
+  punishment-rollback:
+    - ""
+    - "&6 > Rollback punishments"
+    - "&aFormat: &6/punishment options rollback {ADMIN} {LAST TIME (1h/1d/1m)}"
+    - ""
+  punishment-edit:
+    - ""
+    - "&6 > Edit a punishment"
+    - "&aFormat: &6/punishment options edit {PLAYER}"
+    - ""
+  punishment-logs:
+    - ""
+    - "&6 > Player's punishment logs"
+    - "&aFormat: &6/punishment options logs {PLAYER} {LAST TIME (1h/1d/1m)}"

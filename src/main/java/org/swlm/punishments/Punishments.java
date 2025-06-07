@@ -9,6 +9,7 @@ import org.swlm.punishments.commands.BanCommand;
 import org.swlm.punishments.commands.MainCommand;
 import org.swlm.punishments.commands.TempbanCommand;
 import org.swlm.punishments.commands.UnbanCommand;
+import org.swlm.punishments.config.LocaleConfig;
 import org.swlm.punishments.config.MainConfig;
 import org.swlm.punishments.database.impl.MySQLImpl;
 import org.swlm.punishments.database.IDatabase;
@@ -18,6 +19,7 @@ import org.swlm.punishments.listeners.Listeners;
 public final class Punishments extends JavaPlugin {
 
     private MainConfig mainConfig;
+    private LocaleConfig localeConfig;
     private IDatabase database;
     private LuckPerms luckPerms;
 
@@ -30,6 +32,8 @@ public final class Punishments extends JavaPlugin {
         new BanCommand(this);
         new TempbanCommand(this);
         new MainCommand(this);
+
+        localeConfig = new LocaleConfig(this, mainConfig.getString("settings.locale"));
 
         String username = mainConfig.getString("database.user");
         String password = mainConfig.getString("database.password");
@@ -65,5 +69,17 @@ public final class Punishments extends JavaPlugin {
 
     public LuckPerms getLuckPerms() {
         return luckPerms;
+    }
+
+    public LocaleConfig getLocaleConfig() {
+        return localeConfig;
+    }
+
+    public String getDefaultReason() {
+        return mainConfig.getString("settings.default-reason");
+    }
+
+    public String getLocalizing() {
+        return mainConfig.getString("settings.locale");
     }
 }

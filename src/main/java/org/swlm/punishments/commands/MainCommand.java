@@ -28,7 +28,7 @@ public class MainCommand extends AbstractCommand {
         if (!(sender instanceof Player)) return;
 
         if (args.length < 2) {
-            List<String> message = plugin.getMainConfig().getStringList("command-arguments.punishment");
+            List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.punishment");
 
             message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
             return;
@@ -40,7 +40,7 @@ public class MainCommand extends AbstractCommand {
 
         if (Objects.equals(args[1], "rollback")) {
             if (args.length != 4) {
-                List<String> message = plugin.getMainConfig().getStringList("command-arguments.punishment-rollback");
+                List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.punishment-rollback");
                 message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
                 return;
             }
@@ -49,14 +49,14 @@ public class MainCommand extends AbstractCommand {
             String time = args[3];
 
             if (time.length() < 2) {
-                List<String> message = plugin.getMainConfig().getStringList("command-arguments.punishment-rollback");
+                List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.punishment-rollback");
                 message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
                 return;
             }
 
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(name);
             if (offlinePlayer == null) {
-                String message = plugin.getMainConfig().getString("warning-messages.failed-attempt.not-found")
+                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-found")
                         .replace("%player%", name);
 
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -65,7 +65,7 @@ public class MainCommand extends AbstractCommand {
 
             long millis = Utils.getTimeFromString(time);
             int affectedRows = plugin.getDatabase().rollbackPunishments(offlinePlayer.getUniqueId(), millis);
-            String message = plugin.getMainConfig().getString("messages.rollback")
+            String message = plugin.getLocaleConfig().getString("messages.rollback")
                     .replace("%player%", Objects.requireNonNull(offlinePlayer.getName()))
                     .replace("%count%", String.valueOf(affectedRows)
             );
@@ -75,7 +75,7 @@ public class MainCommand extends AbstractCommand {
 
         if (Objects.equals(args[1], "logs")) {
             if (args.length != 4) {
-                List<String> message = plugin.getMainConfig().getStringList("command-arguments.punishment-logs");
+                List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.punishment-logs");
                 message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
                 return;
             }
@@ -84,13 +84,13 @@ public class MainCommand extends AbstractCommand {
             String time = args[3];
 
             if (time.length() < 2) {
-                List<String> message = plugin.getMainConfig().getStringList("command-arguments.punishment-logs");
+                List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.punishment-logs");
                 message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
             }
 
             OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(name);
             if (offlinePlayer == null) {
-                String message = plugin.getMainConfig().getString("warning-messages.failed-attempt.not-found")
+                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-found")
                         .replace("%player%", name);
 
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -103,7 +103,7 @@ public class MainCommand extends AbstractCommand {
             );
 
             if (punishments.isEmpty()) return;
-            IGui gui = new Logging(plugin, "Логи", 6, true, punishments);
+            IGui gui = new Logging(plugin, "&7Логи игрока: &f" + name, 6, true, punishments);
             gui.open(((Player) sender).getPlayer());
         }
     }

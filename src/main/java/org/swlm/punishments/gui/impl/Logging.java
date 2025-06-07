@@ -41,12 +41,12 @@ public class Logging implements IGui {
         PaginatedPane pane = new PaginatedPane(1, 1, 7, 4);
         List<GuiItem> items = new ArrayList<>();
         punishments.forEach(punishment -> {
-            List<String> lore = getPlugin().getMainConfig().getStringList("lore.logging");
+            List<String> lore = getPlugin().getLocaleConfig().getStringList("lore.logging");
 
             ItemStack item = new ItemStack(Material.WRITABLE_BOOK);
             ItemMeta meta = item.getItemMeta();
             meta.displayName(Component.text(" "));
-            meta.lore(Utils.parseComponents(lore, punishment));
+            meta.lore(Utils.parseComponents(plugin, lore, punishment));
             item.setItemMeta(meta);
 
             GuiItem guiItem = new GuiItem(item, inventoryClickEvent ->

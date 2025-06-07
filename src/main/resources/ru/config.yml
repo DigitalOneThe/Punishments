@@ -1,0 +1,107 @@
+database:
+  user: "root"
+  password: ""
+  name: "minecraft"
+  host: "localhost"
+  port: 3306
+
+limits: # Группы, которые будут обходить все запреты.
+  # Этот блок работает следующим образом:
+  # Если игрок имеет группу из этого списка, то команды /ban, /tempban на него не распространяются.
+  # С командой /unban другая логика: Если администратор имея группу ниже заблокирует какого-либо игрока,
+  # то обычный донатер не имея группу ниже не сможет разбанить этого игрока.
+  overrides:
+    - "admin"
+    - "moder"
+  commands: # Распространяется только на временный бан.
+    vip: "30m"
+    admin: "3d"
+    moder: "15d"
+
+
+error-messages:
+  error-in-plugin: "&cПроизошла ошибка в процессе работы плагина, обратитесь к разработчикам!"
+  error-in-database: "&cПроизошла ошибка в процессе работы базы данных, обратитесь к разработчикам!"
+
+warning-messages:
+  failed-attempt:
+    not-found: "&6Игрок %player% не был найден, так-как никогда не заходил на этот сервер"
+    not-banned: "&4Игрок %player% не забанен"
+    has-already-banned: "&4Игрок %player% уже забанен"
+    failed-unban: "&6На данном аккаунте бан от команды проекта, который запрещено снимать!"
+    failed-ban: "&6Вы не можете забанить этого игрока"
+    exceeded-ban-limit: "&6Вы превысили лимит на максимальный срок блокировки. Ваш лимит: %limit%"
+
+safety-messages:
+  suspicious-ban-activity: "&4SECURITY: &6Администратор %admin% заблокировал более 5 игроков за короткое время!"
+  suspicious-unban-activity: "&4SECURITY: &6Администратор %admin% разблокировал более 5 игроков за короткое время!"
+  suspicious-connection-activity: "&4SECURITY: &6За короткое время произошло более %connections% подключений с одного IP адреса: &a%ip%"
+
+broadcast-messages:
+  ban: "&6Игрок %player% был заблокирован администратором %admin% навсегда. Причина: &6[&4%reason%&6]"
+  tempban: "&6Игрок %player% был временно заблокирован на %date% &6администратором %admin% Причина: &6[&4%reason%&6]"
+  unban: "&6Игрок %player% был разблокирован администратором %admin%."
+
+window-messages:
+  ban: "&6Вы были забанены на этом сервере администратором %admin% навсегда. Причина: &6[&4%reason%&6]"
+  tempban: "&6Вы были забанены на этом сервере администратором %admin%. Причина: &6[&4%reason%&6]. &6До авто-разбана %date%."
+
+messages:
+  rollback: "&6Вы успешно откатили все наказания от администратора %player%. Наказаний затронуто &a%count%"
+  edit: "&6Вы успешно отредактировали наказание для игрока %player%. Данные изменились!"
+
+lore:
+  logging:
+    - ""
+    - "&7> &6Администратор: &f%admin%"
+    - "&7> &6Наказанный: &c%player%"
+    - "&7> &6Дата наказания: &f%date%"
+    - "&7> &6Тип наказания: &e%type%"
+    - "&7> &6Причина: &f%reason%"
+    - ""
+
+
+command-arguments:
+  ban:
+    - ""
+    - "&6 > Заблокировать игрока навсегда"
+    - "&aФормат: &e/ban {PLAYER} {REASON}"
+    - ""
+  tempban:
+    - ""
+    - "&6 > Временно заблокировать игрока"
+    - "&aФормат: &e/tempban {PLAYER} {TIME (1h/2d/3s/4m)} {REASON}"
+  unban:
+    - ""
+    - "&6 > Снять блокировку с игрока"
+    - "&aФормат: &e/unban {PLAYER}"
+    - ""
+  history:
+    - ""
+    - "&6 > История наказаний"
+    - "&aФормат: /history {PLAYER} {PUNISHMENT_TYPE} {KEY}" # 3 arg - incoming / outgoing
+    - ""
+  punishment:
+    - ""
+    - "&6 > Основная команда плагина"
+    - "&aФормат: &6/punishment options rollback|edit|logs"
+    - ""
+  punishment-rollback:
+    - ""
+    - "&6 > Откат наказаний"
+    - "&aФормат: &6/punishment options rollback {ADMIN} {LAST TIME (1h/1d/1m)}"
+    - ""
+  punishment-edit:
+    - ""
+    - "&6 > Редактировать наказание"
+    - "&aФормат: &6/punishment options edit {PLAYER}"
+    - ""
+  punishment-logs:
+    - ""
+    - "&6 > Логи наказаний игрока"
+    - "&aФормат: &6/punishment options logs {PLAYER} {LAST TIME (1h/1d/1m)}"
+
+
+
+
+

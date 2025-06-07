@@ -12,6 +12,7 @@ import org.swlm.punishments.storage.impl.Punishment;
 import java.sql.Date;
 import java.text.Normalizer;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.FormatStyle;
@@ -96,7 +97,7 @@ public class Utils {
 
     public static boolean isBanDurationExceeded(Punishments plugin, UUID uuid, long time) throws ExecutionException, InterruptedException {
         String primaryGroup = getPrimaryGroup(plugin, uuid);
-        String exceedBanLimit = plugin.getMainConfig().getString("limits.commands." + primaryGroup.toLowerCase());
+        String exceedBanLimit = plugin.getLocaleConfig().getString("limits.commands." + primaryGroup.toLowerCase());
         if (exceedBanLimit == null) return false;
 
         long limit = getTimeFromString(exceedBanLimit);
@@ -115,11 +116,11 @@ public class Utils {
     }
 
     public static boolean isAdmin(Punishments plugin, UUID uuid) {
-        List<String> list = plugin.getMainConfig().getStringList("limits.overrides");
+        List<String> list = plugin.getLocaleConfig().getStringList("limits.overrides");
         return list.contains(getPrimaryGroup(plugin, uuid));
     }
 
-    public static List<Component> parseComponents(List<String> strings, Punishment punishment) {
+    public static List<Component> parseComponents(Punishments plugin, List<String> strings, Punishment punishment) {
         List<Component> components = new ArrayList<>();
         strings.forEach(string -> {
             OfflinePlayer admin = Bukkit.getOfflinePlayer(punishment.getAdmin());
@@ -129,8 +130,8 @@ public class Utils {
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(
                     FormatStyle.FULL
             ).withLocale(
-                    new Locale("ru", "RU")
-            );
+                    new Locale(plugin.getLocalizing(), plugin.getLocalizing().toUpperCase())
+            ).withZone(ZoneId.systemDefault());
             String dateFormat = localDate.format(formatter);
 
             components.add(Component.text(ChatColor.translateAlternateColorCodes('&', string)

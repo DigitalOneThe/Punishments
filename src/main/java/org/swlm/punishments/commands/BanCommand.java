@@ -28,7 +28,7 @@ public class BanCommand extends AbstractCommand {
         if (!(sender instanceof Player)) return;
 
         if (args.length < 2) {
-            List<String> message = plugin.getMainConfig().getStringList("command-arguments.ban");
+            List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.ban");
 
             message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
             return;
@@ -40,7 +40,7 @@ public class BanCommand extends AbstractCommand {
         String reason = Utils.getFinalArg(args, 1);
 
         if (reason.isEmpty()) {
-            return;
+            reason = plugin.getDefaultReason();
         }
 
         if (reason.length() >= 128) {
@@ -50,7 +50,7 @@ public class BanCommand extends AbstractCommand {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(name);
 
         if (offlinePlayer == null) {
-            String message = plugin.getMainConfig().getString("warning-messages.failed-attempt.not-found")
+            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-found")
                     .replace("%player%", name);
 
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -63,7 +63,7 @@ public class BanCommand extends AbstractCommand {
 
         Punishment punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
         if (punishment != null) {
-            String message = plugin.getMainConfig()
+            String message = plugin.getLocaleConfig()
                     .getString("warning-messages.failed-attempt.has-already-banned")
                     .replace("%player%", name
                     );
@@ -73,12 +73,12 @@ public class BanCommand extends AbstractCommand {
         }
 
         if (Utils.isAdmin(plugin, offlinePlayer.getUniqueId())) {
-            String message = plugin.getMainConfig().getString("warning-messages.failed-attempt.failed-ban");
+            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-ban");
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
             return;
         }
 
-        String message = plugin.getMainConfig().getString("broadcast-messages.ban")
+        String message = plugin.getLocaleConfig().getString("broadcast-messages.ban")
                 .replace("%player%", name)
                 .replace("%admin%", sender.getName())
                 .replace("%reason%", reason
@@ -86,7 +86,7 @@ public class BanCommand extends AbstractCommand {
         Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
 
         if (offlinePlayer.isOnline()) {
-            String banMessage = plugin.getMainConfig().getString("window-messages.ban")
+            String banMessage = plugin.getLocaleConfig().getString("window-messages.ban")
                     .replace("%admin%", player.getName())
                     .replace("%reason%", reason
             );

@@ -29,7 +29,7 @@ public class Listeners implements Listener {
 
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(punishment.getAdmin());
 
-        String message = plugin.getMainConfig().getString("window-messages.ban")
+        String message = plugin.getLocaleConfig().getString("window-messages.ban")
                 .replace("%admin%", Objects.requireNonNull(offlinePlayer.getName()))
                 .replace("%reason%", punishment.getReason()
         );
@@ -50,7 +50,7 @@ public class Listeners implements Listener {
 
         OfflinePlayer player = Bukkit.getOfflinePlayer(punishment.getAdmin());
 
-        String message = plugin.getMainConfig().getString("window-messages.tempban")
+        String message = plugin.getLocaleConfig().getString("window-messages.tempban")
                 .replace("%admin%", Objects.requireNonNull(player.getName()))
                 .replace("%date%", formatTime)
                 .replace("%reason%", punishment.getReason());
