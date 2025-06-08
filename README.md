@@ -19,4 +19,5 @@ Penalty Logging System
 - [x] **Asynchronous work with the database.**
 - [ ] Implement the ability to punish a player in chat, by putting a gag on the player. `(/mute)`
 - [ ] Full-fledged warning system `(/warn)`
+- [ ] Command `/unwarn`
 
