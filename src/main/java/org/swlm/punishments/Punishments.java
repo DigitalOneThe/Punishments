@@ -2,18 +2,14 @@ package org.swlm.punishments;
 
 import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.swlm.punishments.commands.BanCommand;
-import org.swlm.punishments.commands.MainCommand;
-import org.swlm.punishments.commands.TempbanCommand;
-import org.swlm.punishments.commands.UnbanCommand;
+import org.swlm.punishments.commands.*;
 import org.swlm.punishments.config.LocaleConfig;
 import org.swlm.punishments.config.MainConfig;
 import org.swlm.punishments.database.impl.MySQLImpl;
 import org.swlm.punishments.database.IDatabase;
-import org.swlm.punishments.listeners.Listeners;
+import org.swlm.punishments.events.listener.Listeners;
 
 
 public final class Punishments extends JavaPlugin {
@@ -33,6 +29,8 @@ public final class Punishments extends JavaPlugin {
         new BanCommand(this);
         new TempbanCommand(this);
         new MainCommand(this);
+        new UnwarnCommand(this);
+        new WarnCommand(this);
 
         String username = mainConfig.getString("database.user");
         String password = mainConfig.getString("database.password");

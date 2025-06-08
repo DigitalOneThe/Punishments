@@ -11,4 +11,5 @@ public interface IDataSource {
     long getTime();
     long getBanTime();
     String getReason();
+    int getWarnCount();
 }

@@ -26,6 +26,11 @@ public class UnbanCommand extends AbstractCommand {
     @Override
     public void execute(CommandSender sender, Command command, String[] args) {
         if (!(sender instanceof Player)) return;
+        if (!sender.hasPermission("punishments.command.unban") && !sender.isOp()) {
+            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-permission");
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            return;
+        }
 
         if (args.length != 1) {
             List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.unban");

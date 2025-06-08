@@ -1,4 +1,4 @@
-package org.swlm.punishments.listeners;
+package org.swlm.punishments.events;
 
 import org.bukkit.event.Cancellable;
 import org.bukkit.event.Event;
@@ -7,14 +7,14 @@ import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.jetbrains.annotations.NotNull;
 import org.swlm.punishments.storage.impl.Punishment;
 
-public class BanPlayerPreLoginEvent extends Event implements Cancellable {
+public class TemporaryBanPlayerPreLoginEvent extends Event implements Cancellable {
 
     private final Punishment punishment;
     private boolean isCancelled;
     private final AsyncPlayerPreLoginEvent preLoginEvent;
     private static final HandlerList HANDLERS_LIST = new HandlerList();
 
-    public BanPlayerPreLoginEvent(Punishment punishment, AsyncPlayerPreLoginEvent preLoginEvent) {
+    public TemporaryBanPlayerPreLoginEvent(Punishment punishment, AsyncPlayerPreLoginEvent preLoginEvent) {
         super(true);
         this.isCancelled = false;
         this.punishment = punishment;
@@ -22,13 +22,13 @@ public class BanPlayerPreLoginEvent extends Event implements Cancellable {
     }
 
     @Override
-    public boolean isCancelled() {
-        return isCancelled;
+    public boolean callEvent() {
+        return super.callEvent();
     }
 
     @Override
-    public void setCancelled(boolean cancel) {
-        this.isCancelled = cancel;
+    public @NotNull String getEventName() {
+        return super.getEventName();
     }
 
     @Override
@@ -38,6 +38,16 @@ public class BanPlayerPreLoginEvent extends Event implements Cancellable {
 
     public static HandlerList getHandlerList() {
         return HANDLERS_LIST;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return this.isCancelled;
+    }
+
+    @Override
+    public void setCancelled(boolean cancel) {
+        this.isCancelled = cancel;
     }
 
     public Punishment getPunishment() {

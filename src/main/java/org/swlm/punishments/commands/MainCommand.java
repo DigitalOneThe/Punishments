@@ -26,6 +26,11 @@ public class MainCommand extends AbstractCommand {
     @Override
     public void execute(CommandSender sender, Command command, String[] args) {
         if (!(sender instanceof Player)) return;
+        if (!sender.hasPermission("punishments.command.main") && !sender.isOp()) {
+            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-permission");
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            return;
+        }
 
         if (args.length < 2) {
             List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.punishment");

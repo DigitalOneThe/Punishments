@@ -26,22 +26,23 @@ warning-messages:
   failed-attempt:
     not-found: "&6Player %player% was not found, as they have never joined this server."
     not-banned: "&4Player %player% is not banned."
+    not-warned: "&4Player %player% has no warnings."
     has-already-banned: "&4Player %player% is already banned."
+    has-already-warned: "&4Player %player% already has three warnings."
     failed-unban: "&6This account has a ban issued by the project team, which cannot be lifted!"
+    failed-unwarn: "&6This account has a warning from the project team, which is not allowed to be removed!"
     failed-ban: "&6You cannot ban this player."
+    failed-warn: "&6You cannot warn this player."
     exceeded-ban-limit: "&6You have exceeded the maximum ban duration limit. Your limit: %limit%"
     empty-logs: "&6The punishment log from this player in a certain period of time is empty!"
     not-permission: "&cYou do not have permissions to use this command."
-
-safety-messages:
-  suspicious-ban-activity: "&4SECURITY: &6Administrator %admin% has banned more than 5 players in a short time!"
-  suspicious-unban-activity: "&4SECURITY: &6Administrator %admin% has unbanned more than 5 players in a short time!"
-  suspicious-connection-activity: "&4SECURITY: &6More than %connections% connections from a single IP address (%ip%) detected in a short time!"
 
 broadcast-messages:
   ban: "&6Player %player% has been permanently banned by administrator %admin%. Reason: &6[&4%reason%&6]"
   tempban: "&6Player %player% has been temporarily banned for %date% by administrator %admin%. Reason: &6[&4%reason%&6]"
   unban: "&6Player %player% has been unbanned by administrator %admin%."
+  unwarn: "&6Administrator %admin% has removed the warning from player %player%"
+  warn: "&6Administrator %admin% has issued a warning to player %player%. Reason: &6[&4%reason%&6]"
 
 window-messages:
   ban: "&6You have been permanently banned from this server by administrator %admin%. Reason: &6[&4%reason%&6]"
@@ -75,6 +76,16 @@ command-arguments:
     - ""
     - "&6 > Unban a player"
     - "&aFormat: &e/unban {PLAYER}"
+    - ""
+  warn:
+    - ""
+    - "&6 > Give player warning"
+    - "&aFormat: &e/warn {PLAYER} {REASON}"
+    - ""
+  unwarn:
+    - ""
+    - "&6 > Remove the warning from the player"
+    - "&aFormat: &e/unwarn {PLAYER}"
     - ""
   history:
     - ""

@@ -1,4 +1,4 @@
-package org.swlm.punishments.listeners;
+package org.swlm.punishments.events.listener;
 
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -8,6 +8,8 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.swlm.punishments.Punishments;
+import org.swlm.punishments.events.BanPlayerPreLoginEvent;
+import org.swlm.punishments.events.TemporaryBanPlayerPreLoginEvent;
 import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
 
@@ -35,7 +37,9 @@ public class Listeners implements Listener {
         );
 
         event.getPreLoginEvent().setLoginResult(AsyncPlayerPreLoginEvent.Result.KICK_BANNED);
-        event.getPreLoginEvent().kickMessage(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
+        event.getPreLoginEvent().kickMessage(
+                Component.text(ChatColor.translateAlternateColorCodes('&', message))
+        );
     }
 
     @EventHandler

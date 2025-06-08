@@ -14,10 +14,12 @@ public interface IDatabase {
     Connection getConnection() throws SQLException;
     void disable();
     void insertBan(UUID player, UUID admin, PunishmentType type, long unbanTime, String reason);
+    void insertWarn(UUID player, UUID admin, PunishmentType type, int count, String reason);
     void deleteBan(UUID player);
+    void deleteWarn(UUID player);
     int rollbackPunishments(UUID uuid, long millis);
     void updatePunishments();
     void deleteOldLogs();
-    Punishment getPunishmentByUUID(UUID uuid);
+    Punishment getPunishmentByUUID(UUID uuid, PunishmentType... type);
     List<Punishment> getPunishmentsByAdmin(UUID uuid, long timeMillis);
 }

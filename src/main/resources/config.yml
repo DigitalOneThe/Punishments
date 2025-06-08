@@ -16,6 +16,7 @@ logs-settings:
     filter: "-" # Фильтр удаления записей. Record deletion filter. ALL - All records, after the retention time has expired
     # ADMIN PRIORITY - Will delete those penalties that have not been issued by the server administrator. (see limits.overrides)
     # ADMIN PRIORITY - удаляет те наказания, которые не были выданы администратором сервера. (см. limits.overrides (ru or en/config.yml)
+    # FILTER - NOT REALIZED!
     storage-time: "30d" # Максимальное время хранения наказания. Maximum retention time of the punishment.
 
     # Наказания давностью в 30 дней будут удаляться. Penalties 30 days old will be deleted.

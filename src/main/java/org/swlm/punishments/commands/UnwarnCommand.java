@@ -12,29 +12,29 @@ import org.swlm.punishments.Punishments;
 import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
-public class BanCommand extends AbstractCommand {
+public class UnwarnCommand extends AbstractCommand {
 
     private final Punishments plugin;
 
-    public BanCommand(Punishments plugin) {
-        super(plugin, "ban");
+    public UnwarnCommand(Punishments plugin) {
+        super(plugin, "unwarn");
         this.plugin = plugin;
     }
 
     @Override
     public void execute(CommandSender sender, Command command, String[] args) {
         if (!(sender instanceof Player)) return;
-        if (!sender.hasPermission("punishments.command.ban") && !sender.isOp()) {
+        if (!sender.hasPermission("punishments.command.unwarn") && !sender.isOp()) {
             String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-permission");
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
             return;
         }
 
-        if (args.length < 2) {
-            List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.ban");
-
+        if (args.length != 1) {
+            List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.unwarn");
             message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
             return;
         }
@@ -42,13 +42,10 @@ public class BanCommand extends AbstractCommand {
         Player player = (Player)sender;
 
         String name = args[0];
-        String reason = Utils.getFinalArg(args, 1);
+        if (name.isEmpty()) {
+            List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.unwarn");
 
-        if (reason.isEmpty()) {
-            reason = plugin.getDefaultReason();
-        }
-
-        if (reason.length() >= 128) {
+            message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
             return;
         }
 
@@ -62,50 +59,34 @@ public class BanCommand extends AbstractCommand {
             return;
         }
 
-        if (Objects.equals(player.getName(), offlinePlayer.getName())) {
-            return;
-        }
-
-        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
-        if (punishment != null) {
-            String message = plugin.getLocaleConfig()
-                    .getString("warning-messages.failed-attempt.has-already-banned")
-                    .replace("%player%", name
-                    );
-
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
-
-        if (Utils.isAdmin(plugin, offlinePlayer.getUniqueId())) {
-            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-ban");
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
-
-        String message = plugin.getLocaleConfig().getString("broadcast-messages.ban")
-                .replace("%player%", name)
-                .replace("%admin%", sender.getName())
-                .replace("%reason%", reason
+        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(
+                offlinePlayer.getUniqueId(), PunishmentType.WARN
         );
-        Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
 
-        if (offlinePlayer.isOnline()) {
-            String banMessage = plugin.getLocaleConfig().getString("window-messages.ban")
-                    .replace("%admin%", player.getName())
-                    .replace("%reason%", reason
+        if (punishment == null) {
+            String message = plugin.getLocaleConfig()
+                    .getString("warning-messages.failed-attempt.not-warned")
+                    .replace("%player%", name
             );
 
-            player.kick(Component.text(ChatColor.translateAlternateColorCodes('&', banMessage)));
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            return;
         }
 
-        plugin.getDatabase().insertBan(
-                offlinePlayer.getUniqueId(),
-                player.getUniqueId(),
-                PunishmentType.FOREVER,
-                System.currentTimeMillis(),
-                reason
+        if (Utils.isAdmin(plugin, punishment.getAdmin()) && !Utils.isAdmin(plugin, player.getUniqueId())) {
+            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-unwarn");
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            return;
+        }
+
+        plugin.getDatabase().deleteWarn(offlinePlayer.getUniqueId());
+
+        String message = plugin.getLocaleConfig().getString("broadcast-messages.unwarn")
+                .replace("%player%", name)
+                .replace("%admin%", player.getName()
         );
+
+        Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
     }
 
     @Override
@@ -114,9 +95,9 @@ public class BanCommand extends AbstractCommand {
             List<String> names = new ArrayList<>();
             Bukkit.getOnlinePlayers().forEach(player -> names.add(player.getName()));
             return names;
-        } else if (args.length > 1) {
-            return Collections.singletonList("Administrative ban!");
         }
+
+
 
         return null;
     }

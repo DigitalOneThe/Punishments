@@ -7,5 +7,7 @@ commands:
   unban: {}
   tempban: {}
   punishment: {}
+  warn: {}
+  unwarn: {}
 depend:
   - LuckPerms

@@ -27,6 +27,11 @@ public class TempbanCommand extends AbstractCommand {
     @Override
     public void execute(CommandSender sender, Command command, String[] args) {
         if (!(sender instanceof Player)) return;
+        if (!sender.hasPermission("punishments.command.tempban") && !sender.isOp()) {
+            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-permission");
+            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            return;
+        }
 
         if (args.length < 3) {
             List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.tempban");
