@@ -17,7 +17,7 @@ Penalty Logging System
 - [x] All penalties are identified by the player's `UUID`.
 - [x] Canceling penalties from the administrator for a certain period of time.
 - [x] **Asynchronous work with the database.**
+- [x] Full-fledged warning system `(/warn)`
+- [x] Command `/unwarn`
 - [ ] Implement the ability to punish a player in chat, by putting a gag on the player. `(/mute)`
-- [ ] Full-fledged warning system `(/warn)`
-- [ ] Command `/unwarn`
 
