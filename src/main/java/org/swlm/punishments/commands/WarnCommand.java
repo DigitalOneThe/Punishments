@@ -70,7 +70,7 @@ public class WarnCommand extends AbstractCommand {
         Punishment punishment = plugin.getDatabase().getPunishmentByUUID(
                 offlinePlayer.getUniqueId(), PunishmentType.WARN
         );
-        if (punishment != null && punishment.getWarnCount() >= 3) {
+        if (punishment != null && punishment.getWarnCount() >= plugin.getMainConfig().getInt("warn-settings.count")) {
             String message = plugin.getLocaleConfig()
                     .getString("warning-messages.failed-attempt.has-already-warned")
                     .replace("%player%", name

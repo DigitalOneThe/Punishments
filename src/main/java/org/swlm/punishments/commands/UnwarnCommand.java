@@ -97,8 +97,6 @@ public class UnwarnCommand extends AbstractCommand {
             return names;
         }
 
-
-
         return null;
     }
 }

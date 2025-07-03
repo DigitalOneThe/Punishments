@@ -125,6 +125,7 @@ public class Utils {
         strings.forEach(string -> {
             OfflinePlayer admin = Bukkit.getOfflinePlayer(punishment.getAdmin());
             OfflinePlayer player = Bukkit.getOfflinePlayer(punishment.getPlayer());
+            if (!player.hasPlayedBefore() || !admin.hasPlayedBefore()) return;
 
             LocalDate localDate = new Date(punishment.getBanTime()).toLocalDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(
