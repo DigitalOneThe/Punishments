@@ -17,10 +17,6 @@ settings:
 
 logs-settings:
   delete-log-element:
-    filter: "-" # Фильтр удаления записей. Record deletion filter. ALL - All records, after the retention time has expired
-    # ADMIN PRIORITY - Will delete those penalties that have not been issued by the server administrator. (see limits.overrides)
-    # ADMIN PRIORITY - удаляет те наказания, которые не были выданы администратором сервера. (см. limits.overrides (ru or en/config.yml)
-    # FILTER - NOT REALIZED!
     storage-time: "30d" # Максимальное время хранения наказания.
     # Maximum retention time of the punishment.
 
@@ -28,9 +24,6 @@ logs-settings:
     # Penalties 30 days old will be deleted.
     # Этот параметр обязательный, для экономии памяти сервера, по-этому, отказаться от этого не возможно.
     # This parameter is mandatory to save server memory, so it is not possible to opt out.
-
-  unloading-delete-elements: false # Будут ли удаленные наказания выгружаться из истории?
-                                   # Will deleted penalties be unloaded from history?
 
 warn-settings:
             # После какого количества предупреждений игрок получит наказание.

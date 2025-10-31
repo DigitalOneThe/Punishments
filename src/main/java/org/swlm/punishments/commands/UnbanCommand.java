@@ -59,31 +59,32 @@ public class UnbanCommand extends AbstractCommand {
         }
 
 
-        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
-        if (punishment == null) {
-            String message = plugin.getLocaleConfig()
-                    .getString("warning-messages.failed-attempt.not-banned")
-                    .replace("%player%", name
+        plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId()).thenAccept(punishment -> {
+            if (punishment == null) {
+                String message = plugin.getLocaleConfig()
+                        .getString("warning-messages.failed-attempt.not-banned")
+                        .replace("%player%", name
+                        );
+
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                return;
+            }
+
+            if (Utils.isAdmin(plugin, punishment.getAdmin()) && !Utils.isAdmin(plugin, player.getUniqueId())) {
+                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-unban");
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                return;
+            }
+
+            plugin.getDatabase().deleteBan(offlinePlayer.getUniqueId()).exceptionally(throwable -> null);
+
+            String message = plugin.getLocaleConfig().getString("broadcast-messages.unban")
+                    .replace("%player%", name)
+                    .replace("%admin%", player.getName()
             );
 
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
-
-        if (Utils.isAdmin(plugin, punishment.getAdmin()) && !Utils.isAdmin(plugin, player.getUniqueId())) {
-            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-unban");
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
-
-        plugin.getDatabase().deleteBan(offlinePlayer.getUniqueId());
-
-        String message = plugin.getLocaleConfig().getString("broadcast-messages.unban")
-                .replace("%player%", name)
-                .replace("%admin%", player.getName()
-        );
-
-        Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
+            Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
+        });
     }
 
     @Override

@@ -64,72 +64,74 @@ public class TempbanCommand extends AbstractCommand {
             return;
         }
 
-        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
-        if (punishment != null) {
-            String message = plugin.getLocaleConfig()
-                    .getString("warning-messages.failed-attempt.has-already-banned")
-                    .replace("%player%", name
-            );
-
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
-
-        if (Utils.isAdmin(plugin, offlinePlayer.getUniqueId())) {
-            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-ban");
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
-
-        if (Objects.equals(player.getName(), offlinePlayer.getName())) {
-            return;
-        }
-
-        long millis = Utils.getTimeFromString(time);
-        try {
-            if (Utils.isBanDurationExceeded(plugin, player.getUniqueId(), millis)
-                    && !Utils.isAdmin(plugin, player.getUniqueId())) {
+        String finalReason = reason;
+        plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId()).thenAccept(punishment -> {
+            if (punishment != null) {
                 String message = plugin.getLocaleConfig()
-                        .getString("warning-messages.failed-attempt.exceeded-ban-limit").replace("%limit%",
-                        plugin.getLocaleConfig().getString("limits.commands." +
-                                Utils.getPrimaryGroup(plugin, player.getUniqueId())
-                        )
-                );
+                        .getString("warning-messages.failed-attempt.has-already-banned")
+                        .replace("%player%", name
+                        );
+
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
                 return;
             }
-        } catch (ExecutionException | InterruptedException e) {
-            throw new RuntimeException(e);
-        }
+
+            if (Utils.isAdmin(plugin, offlinePlayer.getUniqueId())) {
+                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-ban");
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                return;
+            }
+
+            if (Objects.equals(player.getName(), offlinePlayer.getName())) {
+                return;
+            }
+
+            long millis = Utils.getTimeFromString(time);
+            try {
+                if (Utils.isBanDurationExceeded(plugin, player.getUniqueId(), millis)
+                        && !Utils.isAdmin(plugin, player.getUniqueId())) {
+                    String message = plugin.getLocaleConfig()
+                            .getString("warning-messages.failed-attempt.exceeded-ban-limit").replace("%limit%",
+                                    plugin.getLocaleConfig().getString("limits.commands." +
+                                            Utils.getPrimaryGroup(plugin, player.getUniqueId())
+                                    )
+                            );
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                    return;
+                }
+            } catch (ExecutionException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
 
 
-        String timeFormat = Utils.getRemainingTimeFormat(millis);
-        String message = plugin.getLocaleConfig().getString("broadcast-messages.tempban")
-                .replace("%player%", name)
-                .replace("%admin%", sender.getName())
-                .replace("%reason%", reason)
-                .replace("%date%", timeFormat
-        );
-
-        Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
-
-        if (offlinePlayer.isOnline()) {
-            String banMessage = plugin.getLocaleConfig().getString("window-messages.tempban")
-                    .replace("%admin%", player.getName())
-                    .replace("%reason%", reason)
+            String timeFormat = Utils.getRemainingTimeFormat(millis);
+            String message = plugin.getLocaleConfig().getString("broadcast-messages.tempban")
+                    .replace("%player%", name)
+                    .replace("%admin%", sender.getName())
+                    .replace("%reason%", finalReason)
                     .replace("%date%", timeFormat
-            );
+                    );
 
-            player.kick(Component.text(ChatColor.translateAlternateColorCodes('&', banMessage)));
-        }
+            Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
 
-        plugin.getDatabase().insertBan(
-                offlinePlayer.getUniqueId(),
-                player.getUniqueId(),
-                PunishmentType.TEMPORARILY,
-                System.currentTimeMillis() + millis,
-                reason
-        );
+            if (offlinePlayer.isOnline()) {
+                String banMessage = plugin.getLocaleConfig().getString("window-messages.tempban")
+                        .replace("%admin%", player.getName())
+                        .replace("%reason%", finalReason)
+                        .replace("%date%", timeFormat
+                        );
+
+                player.kick(Component.text(ChatColor.translateAlternateColorCodes('&', banMessage)));
+            }
+
+            plugin.getDatabase().insertBan(
+                    offlinePlayer.getUniqueId(),
+                    player.getUniqueId(),
+                    PunishmentType.TEMPORARILY,
+                    System.currentTimeMillis() + millis,
+                    finalReason
+            ).exceptionally(throwable -> null);
+        });
     }
 
     @Override

@@ -66,46 +66,48 @@ public class BanCommand extends AbstractCommand {
             return;
         }
 
-        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId());
-        if (punishment != null) {
-            String message = plugin.getLocaleConfig()
-                    .getString("warning-messages.failed-attempt.has-already-banned")
-                    .replace("%player%", name
+        String finalReason = reason;
+        plugin.getDatabase().getPunishmentByUUID(offlinePlayer.getUniqueId()).thenAccept(punishment -> {
+            if (punishment != null) {
+                String message = plugin.getLocaleConfig()
+                        .getString("warning-messages.failed-attempt.has-already-banned")
+                        .replace("%player%", name
+                        );
+
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                return;
+            }
+
+            if (Utils.isAdmin(plugin, offlinePlayer.getUniqueId())) {
+                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-ban");
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                return;
+            }
+
+            String message = plugin.getLocaleConfig().getString("broadcast-messages.ban")
+                    .replace("%player%", name)
+                    .replace("%admin%", sender.getName())
+                    .replace("%reason%", finalReason
                     );
+            Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
 
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
+            if (offlinePlayer.isOnline()) {
+                String banMessage = plugin.getLocaleConfig().getString("window-messages.ban")
+                        .replace("%admin%", player.getName())
+                        .replace("%reason%", finalReason
+                        );
 
-        if (Utils.isAdmin(plugin, offlinePlayer.getUniqueId())) {
-            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-ban");
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
+                player.kick(Component.text(ChatColor.translateAlternateColorCodes('&', banMessage)));
+            }
 
-        String message = plugin.getLocaleConfig().getString("broadcast-messages.ban")
-                .replace("%player%", name)
-                .replace("%admin%", sender.getName())
-                .replace("%reason%", reason
-        );
-        Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
-
-        if (offlinePlayer.isOnline()) {
-            String banMessage = plugin.getLocaleConfig().getString("window-messages.ban")
-                    .replace("%admin%", player.getName())
-                    .replace("%reason%", reason
-            );
-
-            player.kick(Component.text(ChatColor.translateAlternateColorCodes('&', banMessage)));
-        }
-
-        plugin.getDatabase().insertBan(
-                offlinePlayer.getUniqueId(),
-                player.getUniqueId(),
-                PunishmentType.FOREVER,
-                System.currentTimeMillis(),
-                reason
-        );
+            plugin.getDatabase().insertBan(
+                    offlinePlayer.getUniqueId(),
+                    player.getUniqueId(),
+                    PunishmentType.FOREVER,
+                    System.currentTimeMillis(),
+                    finalReason
+            ).exceptionally(throwable -> null);
+        });
     }
 
     @Override

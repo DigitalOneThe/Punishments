@@ -9,7 +9,6 @@ import org.bukkit.entity.Player;
 import org.swlm.punishments.Punishments;
 import org.swlm.punishments.gui.IGui;
 import org.swlm.punishments.gui.impl.Logging;
-import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
 
 import java.util.*;
@@ -69,13 +68,14 @@ public class MainCommand extends AbstractCommand {
             }
 
             long millis = Utils.getTimeFromString(time);
-            int affectedRows = plugin.getDatabase().rollbackPunishments(offlinePlayer.getUniqueId(), millis);
-            String message = plugin.getLocaleConfig().getString("messages.rollback")
-                    .replace("%player%", Objects.requireNonNull(offlinePlayer.getName()))
-                    .replace("%count%", String.valueOf(affectedRows)
-            );
+            plugin.getDatabase().rollbackPunishments(offlinePlayer.getUniqueId(), millis).thenAccept(integer -> {
+                String message = plugin.getLocaleConfig().getString("messages.rollback")
+                        .replace("%player%", Objects.requireNonNull(offlinePlayer.getName()))
+                        .replace("%count%", String.valueOf(integer)
+                        );
 
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+            }).exceptionally(throwable -> null);
         }
 
         if (Objects.equals(args[1], "logs")) {
@@ -103,18 +103,21 @@ public class MainCommand extends AbstractCommand {
             }
 
             long millis = Utils.getTimeFromString(time);
-            List<Punishment> punishments = plugin.getDatabase().getPunishmentsByAdmin(
+            plugin.getDatabase().getPunishmentsByAdmin(
                     offlinePlayer.getUniqueId(), millis
-            );
+            ).thenAccept(punishments -> {
+                if (punishments.isEmpty()) {
+                    String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.empty-logs");
+                    sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                    return;
+                }
 
-            if (punishments.isEmpty()) {
-                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.empty-logs");
-                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-                return;
-            }
-
-            IGui gui = new Logging(plugin, "&6Логи игрока: &7" + name, 6, true, punishments);
-            gui.open(((Player) sender).getPlayer());
+                IGui gui = new Logging(plugin, "&6Логи игрока: &7" + name, 6, true, punishments);
+                Bukkit.getScheduler().callSyncMethod(plugin, () -> {
+                    gui.open(((Player) sender).getPlayer());
+                    return null;
+                });
+            }).exceptionally(throwable -> null);
         }
     }
 

@@ -67,22 +67,23 @@ public class Listeners implements Listener {
 
     @EventHandler
     public void onAsyncPlayerPreLoginEvent(AsyncPlayerPreLoginEvent event) {
-        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(event.getUniqueId());
-        if (punishment == null) return;
+        plugin.getDatabase().getPunishmentByUUID(event.getUniqueId()).thenAccept(punishment -> {
+            if (punishment == null) return;
 
-        switch (punishment.getType()) {
-            case FOREVER: {
-                BanPlayerPreLoginEvent banPlayerPreLoginEvent = new BanPlayerPreLoginEvent(punishment, event);
-                Bukkit.getPluginManager().callEvent(banPlayerPreLoginEvent);
-                break;
-            }
+            switch (punishment.getType()) {
+                case FOREVER: {
+                    BanPlayerPreLoginEvent banPlayerPreLoginEvent = new BanPlayerPreLoginEvent(punishment, event);
+                    Bukkit.getPluginManager().callEvent(banPlayerPreLoginEvent);
+                    break;
+                }
 
-            case TEMPORARILY: {
-                TemporaryBanPlayerPreLoginEvent temporaryBanPlayerPreLoginEvent = new TemporaryBanPlayerPreLoginEvent(
-                        punishment, event
-                );
-                Bukkit.getPluginManager().callEvent(temporaryBanPlayerPreLoginEvent);
+                case TEMPORARILY: {
+                    TemporaryBanPlayerPreLoginEvent temporaryBanPlayerPreLoginEvent = new TemporaryBanPlayerPreLoginEvent(
+                            punishment, event
+                    );
+                    Bukkit.getPluginManager().callEvent(temporaryBanPlayerPreLoginEvent);
+                }
             }
-        }
+        });
     }
 }

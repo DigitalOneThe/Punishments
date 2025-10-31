@@ -88,11 +88,11 @@ public class MySQLImpl implements IDatabase {
     }
 
     @Override
-    public void insertBan(UUID player, UUID admin, PunishmentType type, long unbanTime, String reason) {
+    public CompletableFuture<Void> insertBan(UUID player, UUID admin, PunishmentType type, long unbanTime, String reason) {
         long currentTime = System.currentTimeMillis();
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayer(player);
         OfflinePlayer adminPlayer = Bukkit.getOfflinePlayer(admin);
-        CompletableFuture.runAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try (Connection connection = getConnection()) {
                 String query =
                         "INSERT INTO `table_bans` (`player-uuid`, `admin-uuid`, `admin-name`, `player-name`, `ban-type`, `unban-time`, `ban-time`, `ban-reason`) VALUES (?, ?, ?, ?, ?, ?, ?, ?);";
@@ -108,21 +108,21 @@ public class MySQLImpl implements IDatabase {
                     ps.setString(8, reason);
 
                     ps.executeUpdate();
+
+                    insertBanHistory(player, admin, type, currentTime, reason);
                 }
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }).join();
-
-        insertBanHistory(player, admin, type, currentTime, reason);
+        });
     }
 
     @Override
-    public void insertWarn(UUID player, UUID admin, PunishmentType type, int count, String reason) {
+    public CompletableFuture<Void> insertWarn(UUID player, UUID admin, PunishmentType type, int count, String reason) {
         long warnTime = System.currentTimeMillis();
         String query = "INSERT INTO `table_warns` (`player-uuid`, `admin-uuid`, `punishment-type`, `punishment-date`, `count`, `reason`) VALUES (?, ?, ?, ?, ?, ?) ON DUPLICATE KEY UPDATE `count` = count + 1";
 
-        CompletableFuture.runAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setString(1, player.toString());
                 ps.setString(2, admin.toString());
@@ -135,11 +135,11 @@ public class MySQLImpl implements IDatabase {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }).join();
+        });
     }
 
-    public void insertBanHistory(UUID player, UUID admin, PunishmentType type, long banDate, String reason) {
-        CompletableFuture.runAsync(() -> {
+    public CompletableFuture<Void> insertBanHistory(UUID player, UUID admin, PunishmentType type, long banDate, String reason) {
+        return CompletableFuture.runAsync(() -> {
             String query = "INSERT INTO `table_ban_logs` (`player-uuid`, `admin-uuid`, `ban-type`, `ban-date`, `ban-reason`) VALUES (?, ?, ?, ?, ?)";
             try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setString(1, player.toString());
@@ -152,39 +152,39 @@ public class MySQLImpl implements IDatabase {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }).join();
+        });
     }
 
     @Override
-    public void deleteBan(UUID player) {
+    public CompletableFuture<Void> deleteBan(UUID player) {
         String query = "DELETE FROM `table_bans` WHERE `player-uuid` = ? LIMIT 1";
 
-        CompletableFuture.runAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setString(1, player.toString());
                 ps.executeUpdate();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }).join();
+        });
     }
 
     @Override
-    public void deleteWarn(UUID player) {
+    public CompletableFuture<Void> deleteWarn(UUID player) {
         String query = "DELETE FROM `table_warns` WHERE `player-uuid` = ? LIMIT 1";
 
-        CompletableFuture.runAsync(() -> {
+        return CompletableFuture.runAsync(() -> {
             try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
                 ps.setString(1, player.toString());
                 ps.executeUpdate();
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }).join();
+        });
     }
 
     @Override
-    public int rollbackPunishments(UUID uuid, long millis) {
+    public CompletableFuture<Integer> rollbackPunishments(UUID uuid, long millis) {
         return CompletableFuture.supplyAsync(() -> {
             int affectedRows;
             long cutoffTimeMillis = System.currentTimeMillis() - millis;
@@ -199,12 +199,12 @@ public class MySQLImpl implements IDatabase {
             }
 
             return affectedRows;
-        }).join();
+        });
     }
 
     @Override
-    public void updatePunishments() {
-        CompletableFuture.runAsync(() -> {
+    public CompletableFuture<Void> updatePunishments() {
+        return CompletableFuture.runAsync(() -> {
             String query = "DELETE FROM `table_bans` WHERE `unban-time` <= ? AND `ban-type` != 'FOREVER'";
 
             try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
@@ -213,12 +213,12 @@ public class MySQLImpl implements IDatabase {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }).join();
+        });
     }
 
     @Override
-    public void deleteOldLogs() {
-        CompletableFuture.runAsync(() -> {
+    public CompletableFuture<Void> deleteOldLogs() {
+        return CompletableFuture.runAsync(() -> {
             String query = "DELETE FROM `table_ban_logs` WHERE `ban-date` < ?";
 
             try (Connection connection = getConnection(); PreparedStatement ps = connection.prepareStatement(query)) {
@@ -227,11 +227,11 @@ public class MySQLImpl implements IDatabase {
             } catch (SQLException e) {
                 throw new RuntimeException(e);
             }
-        }).join();
+        });
     }
 
     @Override
-    public Punishment getPunishmentByUUID(UUID uuid, PunishmentType... type) {
+    public CompletableFuture<Punishment> getPunishmentByUUID(UUID uuid, PunishmentType... type) {
         if (type.length == 0) {
             return CompletableFuture.supplyAsync(() -> {
                 String query = "SELECT * FROM `table_bans` WHERE `player-uuid` = ? LIMIT 1";
@@ -260,7 +260,7 @@ public class MySQLImpl implements IDatabase {
                 }
 
                 return punishment;
-            }).join();
+            });
         }
 
         if (Objects.requireNonNull(type[0]) == WARN) {
@@ -288,14 +288,14 @@ public class MySQLImpl implements IDatabase {
                 }
 
                 return punishment;
-            }).join();
+            });
         }
 
         return null;
     }
 
     @Override
-    public List<Punishment> getPunishmentsByAdmin(UUID uuid, long timeMillis) {
+    public CompletableFuture<List<Punishment>> getPunishmentsByAdmin(UUID uuid, long timeMillis) {
         return CompletableFuture.supplyAsync(() -> {
             String query = "SELECT * FROM `table_ban_logs` WHERE `admin-uuid` = ? AND `ban-date` < ?";
 
@@ -331,6 +331,6 @@ public class MySQLImpl implements IDatabase {
             }
 
             return punishments;
-        }).join();
+        });
     }
 }

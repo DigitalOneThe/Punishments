@@ -67,40 +67,42 @@ public class WarnCommand extends AbstractCommand {
             return;
         }
 
-        Punishment punishment = plugin.getDatabase().getPunishmentByUUID(
+        String finalReason = reason;
+        plugin.getDatabase().getPunishmentByUUID(
                 offlinePlayer.getUniqueId(), PunishmentType.WARN
-        );
-        if (punishment != null && punishment.getWarnCount() >= plugin.getMainConfig().getInt("warn-settings.count")) {
-            String message = plugin.getLocaleConfig()
-                    .getString("warning-messages.failed-attempt.has-already-warned")
-                    .replace("%player%", name
-            );
+        ).thenAccept(punishment -> {
+            if (punishment != null && punishment.getWarnCount() >= plugin.getMainConfig().getInt("warn-settings.count")) {
+                String message = plugin.getLocaleConfig()
+                        .getString("warning-messages.failed-attempt.has-already-warned")
+                        .replace("%player%", name
+                        );
 
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                return;
+            }
 
-        if (Utils.isAdmin(plugin, offlinePlayer.getUniqueId())) {
-            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-warn");
-            sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
-            return;
-        }
+            if (Utils.isAdmin(plugin, offlinePlayer.getUniqueId())) {
+                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-warn");
+                sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
+                return;
+            }
 
-        String message = plugin.getLocaleConfig().getString("broadcast-messages.warn")
-                .replace("%player%", name)
-                .replace("%admin%", sender.getName())
-                .replace("%reason%", reason
-        );
-        Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
+            String message = plugin.getLocaleConfig().getString("broadcast-messages.warn")
+                    .replace("%player%", name)
+                    .replace("%admin%", sender.getName())
+                    .replace("%reason%", finalReason
+                    );
+            Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
 
-        assert punishment != null;
-        plugin.getDatabase().insertWarn(
-                offlinePlayer.getUniqueId(),
-                player.getUniqueId(),
-                PunishmentType.WARN,
-                1,
-                reason
-        );
+            assert punishment != null;
+            plugin.getDatabase().insertWarn(
+                    offlinePlayer.getUniqueId(),
+                    player.getUniqueId(),
+                    PunishmentType.WARN,
+                    1,
+                    finalReason
+            ).exceptionally(throwable -> null);
+        });
     }
 
     @Override
