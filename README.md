@@ -19,5 +19,6 @@ Penalty Logging System
 - [x] **Asynchronous work with the database.**
 - [x] Full-fledged warning system `(/warn)`
 - [x] Command `/unwarn`
+- [x] Optimized work with configuration files. All lines from the localization config are saved to RAM.
 - [ ] Implement the ability to punish a player in chat, by putting a gag on the player. `(/mute)`
 
