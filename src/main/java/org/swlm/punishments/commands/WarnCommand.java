@@ -10,7 +10,6 @@ import org.bukkit.entity.Player;
 import org.swlm.punishments.PunishmentType;
 import org.swlm.punishments.Punishments;
 import org.swlm.punishments.config.ConfigStringKeys;
-import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
 
 import java.util.ArrayList;

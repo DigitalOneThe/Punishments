@@ -11,7 +11,7 @@ public class Punishment implements IDataSource {
     private final UUID adminUuid;
     private final PunishmentType type;
     private long time;
-    private long banTime;
+    private final long banTime;
     private final String reason;
     private int warnCount;
 
