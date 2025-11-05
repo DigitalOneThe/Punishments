@@ -46,4 +46,8 @@ public class LocaleConfig {
     public int getInt(String path) {
         return yamlConfiguration.getInt(path);
     }
+
+    public Object getObject(String path) {
+        return yamlConfiguration.get(path);
+    }
 }

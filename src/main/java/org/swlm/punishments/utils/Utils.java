@@ -7,6 +7,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.OfflinePlayer;
 import org.swlm.punishments.Punishments;
+import org.swlm.punishments.config.ConfigStringKeys;
 import org.swlm.punishments.storage.impl.Punishment;
 
 import java.sql.Date;
@@ -94,11 +95,11 @@ public class Utils {
 
     public static boolean isBanDurationExceeded(Punishments plugin, UUID uuid, long time) throws ExecutionException, InterruptedException {
         String primaryGroup = getPrimaryGroup(plugin, uuid);
-        String exceedBanLimit = plugin.getLocaleConfig().getString("limits.commands." + primaryGroup.toLowerCase());
-        if (exceedBanLimit == null) return false;
+        String exceedBanLimit = plugin.getConfigCache().getStringByPath(
+                "limits.commands." + primaryGroup, String.class
+        );
 
         long limit = getTimeFromString(exceedBanLimit);
-
         return time > limit;
     }
 
@@ -113,17 +114,22 @@ public class Utils {
     }
 
     public static boolean isAdmin(Punishments plugin, UUID uuid) {
-        List<String> list = plugin.getLocaleConfig().getStringList("limits.overrides");
+        List<String> list = plugin.getConfigCache().getList(ConfigStringKeys.LIMITS_OVERRIDES, String.class);
         return list.contains(getPrimaryGroup(plugin, uuid));
     }
 
     public static List<Component> parseComponents(Punishments plugin, List<String> strings, Punishment punishment) {
         List<Component> components = new ArrayList<>();
-        strings.forEach(string -> {
-            OfflinePlayer admin = Bukkit.getOfflinePlayer(punishment.getAdmin());
-            OfflinePlayer player = Bukkit.getOfflinePlayer(punishment.getPlayer());
-            if (!player.hasPlayedBefore() || !admin.hasPlayedBefore()) return;
+        OfflinePlayer admin = Bukkit.getOfflinePlayer(punishment.getAdmin());
+        OfflinePlayer player = Bukkit.getOfflinePlayer(punishment.getPlayer());
+        if (!player.hasPlayedBefore() || !admin.hasPlayedBefore()) {
+            components.add(Component.text(ChatColor.translateAlternateColorCodes(
+                    '&', "&6Нет информации!"))
+            );
+            return components;
+        }
 
+        strings.forEach(string -> {
             LocalDate localDate = new Date(punishment.getBanTime()).toLocalDate();
             DateTimeFormatter formatter = DateTimeFormatter.ofLocalizedDate(
                     FormatStyle.FULL

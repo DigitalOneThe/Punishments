@@ -9,7 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.swlm.punishments.PunishmentType;
 import org.swlm.punishments.Punishments;
-import org.swlm.punishments.storage.impl.Punishment;
+import org.swlm.punishments.config.ConfigStringKeys;
 import org.swlm.punishments.utils.Utils;
 
 import java.util.ArrayList;
@@ -28,13 +28,13 @@ public class UnwarnCommand extends AbstractCommand {
     public void execute(CommandSender sender, Command command, String[] args) {
         if (!(sender instanceof Player)) return;
         if (!sender.hasPermission("punishments.command.unwarn") && !sender.isOp()) {
-            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-permission");
+            String message = plugin.getConfigCache().getString(ConfigStringKeys.WARNING_MESSAGES_FAILED_ATTEMPT_NOT_PERMISSION);
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
             return;
         }
 
         if (args.length != 1) {
-            List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.unwarn");
+            List<String> message = plugin.getConfigCache().getList(ConfigStringKeys.COMMAND_ARGUMENTS_UNWARN, String.class);
             message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
             return;
         }
@@ -43,8 +43,7 @@ public class UnwarnCommand extends AbstractCommand {
 
         String name = args[0];
         if (name.isEmpty()) {
-            List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.unwarn");
-
+            List<String> message = plugin.getConfigCache().getList(ConfigStringKeys.COMMAND_ARGUMENTS_UNWARN, String.class);
             message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
             return;
         }
@@ -52,7 +51,7 @@ public class UnwarnCommand extends AbstractCommand {
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(name);
 
         if (offlinePlayer == null) {
-            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-found")
+            String message = plugin.getConfigCache().getString(ConfigStringKeys.WARNING_MESSAGES_FAILED_ATTEMPT_NOT_FOUND)
                     .replace("%player%", name);
 
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -63,24 +62,24 @@ public class UnwarnCommand extends AbstractCommand {
                 offlinePlayer.getUniqueId(), PunishmentType.WARN
         ).thenAccept(punishment -> {
             if (punishment == null) {
-                String message = plugin.getLocaleConfig()
-                        .getString("warning-messages.failed-attempt.not-warned")
+                String message = plugin.getConfigCache()
+                        .getString(ConfigStringKeys.WARNING_MESSAGES_FAILED_ATTEMPT_NOT_WARNED)
                         .replace("%player%", name
-                        );
+                );
 
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
                 return;
             }
 
             if (Utils.isAdmin(plugin, punishment.getAdmin()) && !Utils.isAdmin(plugin, player.getUniqueId())) {
-                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-unwarn");
+                String message = plugin.getConfigCache().getString(ConfigStringKeys.WARNING_MESSAGES_FAILED_ATTEMPT_FAILED_UNWARN);
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
                 return;
             }
 
             plugin.getDatabase().deleteWarn(offlinePlayer.getUniqueId()).exceptionally(throwable -> null);
 
-            String message = plugin.getLocaleConfig().getString("broadcast-messages.unwarn")
+            String message = plugin.getConfigCache().getString(ConfigStringKeys.BROADCAST_MESSAGES_UNWARN)
                     .replace("%player%", name)
                     .replace("%admin%", player.getName()
                     );

@@ -12,6 +12,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.swlm.punishments.Punishments;
+import org.swlm.punishments.config.ConfigStringKeys;
 import org.swlm.punishments.gui.IGui;
 import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
@@ -42,7 +43,7 @@ public class Logging implements IGui {
         PaginatedPane pane = new PaginatedPane(1, 1, 7, 4);
         List<GuiItem> items = new ArrayList<>();
         punishments.forEach(punishment -> {
-            List<String> lore = getPlugin().getLocaleConfig().getStringList("lore.logging");
+            List<String> lore = getPlugin().getConfigCache().getList(ConfigStringKeys.LORE_LOGGING, String.class);
 
             ItemStack item = new ItemStack(Material.WRITABLE_BOOK);
             ItemMeta meta = item.getItemMeta();

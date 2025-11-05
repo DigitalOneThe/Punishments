@@ -9,6 +9,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.swlm.punishments.PunishmentType;
 import org.swlm.punishments.Punishments;
+import org.swlm.punishments.config.ConfigStringKeys;
 import org.swlm.punishments.storage.impl.Punishment;
 import org.swlm.punishments.utils.Utils;
 
@@ -30,14 +31,13 @@ public class WarnCommand extends AbstractCommand {
     public void execute(CommandSender sender, Command command, String[] args) {
         if (!(sender instanceof Player)) return;
         if (!sender.hasPermission("punishments.command.warn") && !sender.isOp()) {
-            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-permission");
+            String message = plugin.getConfigCache().getString(ConfigStringKeys.WARNING_MESSAGES_FAILED_ATTEMPT_NOT_PERMISSION);
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
             return;
         }
 
         if (args.length < 2) {
-            List<String> message = plugin.getLocaleConfig().getStringList("command-arguments.warn");
-
+            List<String> message = plugin.getConfigCache().getList(ConfigStringKeys.COMMAND_ARGUMENTS_WARN, String.class);
             message.forEach(s -> sender.sendMessage(ChatColor.translateAlternateColorCodes('&', s)));
             return;
         }
@@ -56,7 +56,7 @@ public class WarnCommand extends AbstractCommand {
 
         OfflinePlayer offlinePlayer = Bukkit.getOfflinePlayerIfCached(name);
         if (offlinePlayer == null) {
-            String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.not-found")
+            String message = plugin.getConfigCache().getString(ConfigStringKeys.WARNING_MESSAGES_FAILED_ATTEMPT_NOT_FOUND)
                     .replace("%player%", name);
 
             sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
@@ -72,26 +72,26 @@ public class WarnCommand extends AbstractCommand {
                 offlinePlayer.getUniqueId(), PunishmentType.WARN
         ).thenAccept(punishment -> {
             if (punishment != null && punishment.getWarnCount() >= plugin.getMainConfig().getInt("warn-settings.count")) {
-                String message = plugin.getLocaleConfig()
-                        .getString("warning-messages.failed-attempt.has-already-warned")
+                String message = plugin.getConfigCache()
+                        .getString(ConfigStringKeys.WARNING_MESSAGES_FAILED_ATTEMPT_HAS_ALREADY_WARNED)
                         .replace("%player%", name
-                        );
+                );
 
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
                 return;
             }
 
             if (Utils.isAdmin(plugin, offlinePlayer.getUniqueId())) {
-                String message = plugin.getLocaleConfig().getString("warning-messages.failed-attempt.failed-warn");
+                String message = plugin.getConfigCache().getString(ConfigStringKeys.WARNING_MESSAGES_FAILED_ATTEMPT_FAILED_WARN);
                 sender.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
                 return;
             }
 
-            String message = plugin.getLocaleConfig().getString("broadcast-messages.warn")
+            String message = plugin.getConfigCache().getString(ConfigStringKeys.BROADCAST_MESSAGES_WARN)
                     .replace("%player%", name)
                     .replace("%admin%", sender.getName())
                     .replace("%reason%", finalReason
-                    );
+            );
             Bukkit.broadcast(Component.text(ChatColor.translateAlternateColorCodes('&', message)));
 
             assert punishment != null;
