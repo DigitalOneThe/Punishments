@@ -4,6 +4,8 @@ import net.luckperms.api.LuckPerms;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.swlm.punishments.chat.ChatFilter;
+import org.swlm.punishments.chat.ViolationLevel;
 import org.swlm.punishments.commands.*;
 import org.swlm.punishments.config.ConfigCache;
 import org.swlm.punishments.config.ConfigStringKeys;
@@ -13,7 +15,9 @@ import org.swlm.punishments.database.impl.MySQLImpl;
 import org.swlm.punishments.database.IDatabase;
 import org.swlm.punishments.events.listener.Listeners;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 
 public final class Punishments extends JavaPlugin {
@@ -23,9 +27,12 @@ public final class Punishments extends JavaPlugin {
     private IDatabase database;
     private LuckPerms luckPerms;
     private ConfigCache configCache;
+    private ChatFilter chatFilter;
 
     @Override
     public void onEnable() {
+        final Map<String, ViolationLevel> violationLevelMap = new HashMap<>();
+
         getServer().getPluginManager().registerEvents(new Listeners(this), this);
 
         mainConfig = new MainConfig(this);
@@ -59,6 +66,25 @@ public final class Punishments extends JavaPlugin {
         if (provider != null) {
             luckPerms = provider.getProvider();
         }
+
+        List<String> blackListWords = mainConfig.getStringList("blacklist.words");
+        blackListWords.forEach(string -> {
+            String[] splitString = string.split(":");
+
+            String words = splitString[0];
+            String violationLevel = splitString[1];
+
+            if (words.contains(" ")) {
+                violationLevelMap.put(words.toLowerCase(), ViolationLevel.valueOf(violationLevel));
+            }
+
+            String[] individualWords = words.split("\\s+");
+            for (String word : individualWords) {
+                violationLevelMap.put(word.toLowerCase(), ViolationLevel.valueOf(violationLevel));
+            }
+        });
+
+        chatFilter = new ChatFilter(this, violationLevelMap);
     }
 
     @Override
@@ -96,5 +122,9 @@ public final class Punishments extends JavaPlugin {
 
     public ConfigCache getConfigCache() {
         return configCache;
+    }
+
+    public ChatFilter getChatFilter() {
+        return chatFilter;
     }
 }

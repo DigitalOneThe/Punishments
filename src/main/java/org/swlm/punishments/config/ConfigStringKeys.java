@@ -11,6 +11,8 @@ public enum ConfigStringKeys {
     // Limits section
     LIMITS_OVERRIDES("limits.overrides"),
     LIMITS_COMMANDS("limits.commands"),
+    BLACKLIST_OF_WORDS("blacklist.words"),
+    BLACKLIST_OF_WORDS_IS_ENABLED("blacklist.blacklist-of-words"),
 
     // Error messages section
     ERROR_MESSAGES_ERROR_IN_PLUGIN("error-messages.error-in-plugin"),

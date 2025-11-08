@@ -9,6 +9,16 @@ database: # Настройки базы данных.
   host: "localhost" # HOST
   port: 3306 # PORT
 
+blacklist:
+  blacklist-of-words: false
+  words:
+    - "cocksucker:VIOLATION_LEVEL_MILD"
+    - "faggot:VIOLATION_LEVEL_MILD"
+    - "whore mother:VIOLATION_LEVEL_MILD"
+    - "мать шлюха:VIOLATION_LEVEL_MILD"
+    - "пидор:VIOLATION_LEVEL_MILD"
+
+
 settings:
   locale: "ru" # Локализация плагина. Пока-что есть две версии локализации.
                # (Ru/En) Localizing plugin. (Ru/En)
